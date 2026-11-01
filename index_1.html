@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dziennik RSA</title>
+<meta name="description" content="Racjonalna Samoanaliza (RSA, nurt RTZ): analiza krok po kroku, dziennik i wzorce w czasie.">
+<meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131815" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dziennik RSA">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<style>
+/* Layout: aplikacja z zakładkami; kreator krok po kroku z szyną kroków po lewej (na telefonie u góry). Dwie strony formularza RSA kodowane kolorem: „jak jest” (śliwka) i „jak chcę” (mech). */
+:root{
+  --bg:#F2F4F1; --surface:#FFFFFF; --sunk:#E7EBE6; --line:#D3DAD2;
+  --ink:#1D2520; --muted:#5D6A61;
+  --now:#7A4E78; --now-soft:#F1E7F0;
+  --goal:#2F6B4B; --goal-soft:#E2EFE6;
+  --bal:#8A6A1F; --bal-soft:#F5EEDB;
+  --danger:#A23A3A;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#131815; --surface:#1B211D; --sunk:#232A25; --line:#333C36;
+  --ink:#E6ECE7; --muted:#9AA79E;
+  --now:#D19BCD; --now-soft:#33232F;
+  --goal:#7FC59C; --goal-soft:#1D3326;
+  --bal:#D9B567; --bal-soft:#352C18;
+  --danger:#E58A8A; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#131815; --surface:#1B211D; --sunk:#232A25; --line:#333C36;
+  --ink:#E6ECE7; --muted:#9AA79E;
+  --now:#D19BCD; --now-soft:#33232F;
+  --goal:#7FC59C; --goal-soft:#1D3326;
+  --bal:#D9B567; --bal-soft:#352C18;
+  --danger:#E58A8A; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.2}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--goal);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* header */
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding-block:22px 18px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-size:1.6rem}
+.brand span{color:var(--muted);font-size:.85rem}
+nav{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:999px}
+nav button{border:0;background:none;padding:7px 16px;border-radius:999px;cursor:pointer;font-weight:500;color:var(--muted)}
+nav button[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .08)}
+
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:.92rem}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--goal);border-color:var(--goal);color:var(--surface)}
+.btn.ghost{background:none;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink)}
+.btn.danger{color:var(--danger);border-color:var(--danger);background:none}
+.btn.small{padding:5px 12px;font-size:.85rem}
+.linkbtn{border:0;background:none;color:var(--muted);cursor:pointer;padding:4px 6px;font-size:.85rem;border-radius:6px}
+.linkbtn:hover{color:var(--danger);background:var(--sunk)}
+
+/* wizard */
+.wizard{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;align-items:start}
+.rail{position:sticky;top:16px;display:flex;flex-direction:column;gap:2px}
+.rail button{display:grid;grid-template-columns:26px 1fr;align-items:center;gap:8px;text-align:left;border:0;background:none;padding:6px 10px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:.9rem}
+.rail button:hover{background:var(--sunk)}
+.rail button[aria-current="step"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgb(0 0 0 / .06)}
+.rail .num{font-variant-numeric:tabular-nums;font-size:.78rem;text-align:center;border-radius:6px;padding:1px 0;font-weight:700}
+.rail .done .num{opacity:1}
+.s-now .num{color:var(--now);background:var(--now-soft)}
+.s-goal .num{color:var(--goal);background:var(--goal-soft)}
+.s-bal .num,.s-check .num{color:var(--bal);background:var(--bal-soft)}
+.s-sum .num{color:var(--ink);background:var(--sunk)}
+.rail .sep{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:12px 10px 4px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px clamp(18px,4vw,36px) 24px;min-width:0}
+.stephead{display:grid;grid-template-columns:auto 1fr;gap:4px 20px;align-items:end;margin-bottom:22px}
+.letter{grid-row:span 2;font-family:var(--display);font-size:clamp(3.4rem,8vw,5rem);line-height:.85;letter-spacing:-.02em}
+.side-now .letter{color:var(--now)} .side-goal .letter{color:var(--goal)} .side-bal .letter,.side-check .letter{color:var(--bal)} .side-sum .letter{color:var(--ink)}
+.eyebrow{font-size:.74rem;text-transform:uppercase;letter-spacing:.09em;font-weight:600;color:var(--muted)}
+.stephead h2{font-size:clamp(1.4rem,3vw,1.85rem)}
+.help{color:var(--muted);max-width:62ch;margin:0 0 20px}
+.fields{display:flex;flex-direction:column;gap:20px}
+label.f{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.92rem}
+label.f small{font-weight:400;color:var(--muted)}
+textarea,input[type=text],input[type=date]{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);padding:10px 12px;resize:vertical;font-weight:400}
+textarea:focus,input:focus{border-color:var(--goal);outline:none;background:var(--surface)}
+.row2{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.listitem{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start}
+.listitem .tag{font-family:var(--display);color:var(--muted);padding-top:9px;min-width:2.2em}
+.thought{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.thought .top{display:flex;justify-content:space-between;align-items:center}
+.thought .lbl{font-family:var(--display);color:var(--now);font-size:1.1rem}
+.thought input[type=text]{background:var(--surface)}
+.thought textarea{background:var(--surface)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:.8rem;cursor:pointer;color:var(--muted)}
+.chip:hover{border-color:var(--now);color:var(--now)}
+.emo{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 2.2em auto;gap:10px;align-items:center}
+.emo output{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+input[type=range]{width:100%;accent-color:var(--now)}
+.side-goal input[type=range]{accent-color:var(--goal)}
+.note{background:var(--bal-soft);border-radius:var(--r);padding:12px 14px;font-size:.92rem;display:flex;flex-direction:column;gap:8px}
+.note .inline{display:flex;gap:8px;flex-wrap:wrap}
+.note .inline input{flex:1 1 220px}
+.pairB{background:var(--now-soft);border-radius:var(--r);padding:10px 12px;font-size:.92rem}
+.pairB b{font-family:var(--display);font-weight:400;color:var(--now);margin-right:6px}
+.qgrid{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.q{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;font-size:.92rem;padding:6px 0;border-top:1px solid var(--line)}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:4px 12px;cursor:pointer;font-size:.85rem;color:var(--muted)}
+.seg button[aria-pressed="true"].yes{background:var(--goal);color:var(--surface)}
+.seg button[aria-pressed="true"].no{background:var(--now);color:var(--surface)}
+.stepnav{display:flex;justify-content:space-between;gap:10px;margin-top:28px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.add{align-self:flex-start}
+
+/* summary */
+.sumgrid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.sumcol h3{font-size:1.05rem;padding:10px 14px}
+.sumcol.now h3{background:var(--now-soft);color:var(--now)}
+.sumcol.goal h3{background:var(--goal-soft);color:var(--goal)}
+.sumcol.goal{border-left:1px solid var(--line)}
+.sumcell{padding:12px 14px;border-top:1px solid var(--line);font-size:.93rem}
+.sumcell .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:4px}
+.sumcell p{margin:0 0 4px;white-space:pre-wrap}
+.empty{color:var(--muted);font-style:italic}
+.bal{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.balbox{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.93rem}
+.balbox .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--bal);font-weight:700;margin-bottom:4px}
+.balbox ul{margin:0;padding-left:18px}
+.pill{display:inline-block;font-size:.75rem;padding:1px 8px;border-radius:999px;background:var(--now-soft);color:var(--now);font-weight:600;margin-left:4px;vertical-align:1px}
+.pill.goal{background:var(--goal-soft);color:var(--goal)}
+.pill.ex{background:var(--bal-soft);color:var(--bal)}
+
+/* journal */
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.toolbar h2{font-size:1.6rem}
+.banner{background:var(--bal-soft);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px;font-size:.92rem}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.entry{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:8px;min-width:0}
+.entry:hover{border-color:var(--muted)}
+.entry .d{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.entry h3{font-size:1.15rem}
+.entry .bline{font-size:.9rem;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.meter{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.meter .bar{flex:1;height:6px;background:var(--sunk);border-radius:3px;position:relative;overflow:hidden}
+.meter .bar i{position:absolute;inset:0 auto 0 0;background:var(--now);border-radius:3px}
+.meter .bar i.g{background:var(--goal);opacity:.7}
+details.tools{margin-top:28px;border-top:1px solid var(--line);padding-top:14px}
+details.tools summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.toolsgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.toolsgrid textarea{font-family:ui-monospace,Menlo,monospace;font-size:.8rem;height:140px}
+
+/* patterns */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.stat .v{font-family:var(--display);font-size:1.9rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .l{font-size:.82rem;color:var(--muted)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+.panel.wide{grid-column:1/-1}
+.panel h3{font-size:1.15rem;margin-bottom:4px}
+.panel .sub{font-size:.85rem;color:var(--muted);margin:0 0 12px}
+.hbar{display:grid;grid-template-columns:minmax(0,1fr) 2fr 2em;gap:10px;align-items:center;font-size:.9rem;padding:4px 0}
+.hbar .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar .b{height:10px;background:var(--sunk);border-radius:5px;position:relative;overflow:hidden}
+.hbar .b i{position:absolute;inset:0 auto 0 0;border-radius:5px;background:var(--now)}
+.hbar .b i.bal{background:var(--bal)}
+.hbar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.chartbox{overflow-x:auto}
+.chartbox svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;font-size:.82rem;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.recur{display:flex;flex-direction:column;gap:12px}
+.recur .grp b{font-family:var(--display);font-weight:400;color:var(--now)}
+.recur ul{margin:4px 0 0;padding-left:18px;font-size:.92rem}
+.recur li span{color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums}
+.roadmap{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:8px}
+.idea{border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:.9rem}
+.idea b{display:block;margin-bottom:4px}
+.foot{margin-top:40px;font-size:.8rem;color:var(--muted);max-width:70ch}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:.9rem;font-weight:500;z-index:20}
+
+/* touch & shared */
+button,input,textarea,label{touch-action:manipulation}
+textarea,input{font-size:16px}
+.btn{min-height:44px}
+.btn.small{min-height:38px}
+.navico{display:none}
+.mprog{display:none}
+.xbtn{width:40px;height:40px;border:0;background:none;border-radius:10px;color:var(--muted);font-size:1.5rem;line-height:1;cursor:pointer;flex:0 0 auto}
+.xbtn:hover{background:var(--sunk);color:var(--danger)}
+.stepnav .primary{margin-left:auto}
+.discard{display:flex;justify-content:center;margin-top:8px}
+
+@media (max-width:760px){
+  body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  body.typing{padding-bottom:24px}
+  header{padding-block:14px 12px;margin-bottom:14px}
+  .brand{flex-direction:column;gap:0}
+  .brand h1{font-size:1.4rem}
+  .brand span{font-size:.78rem}
+  /* bottom tab bar */
+  nav{position:fixed;left:0;right:0;bottom:0;z-index:15;border-radius:0;gap:4px;background:var(--surface);border-top:1px solid var(--line);
+    padding:6px max(8px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-right,0px))}
+  nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.74rem;padding:6px 4px;border-radius:12px;min-height:52px}
+  nav button[aria-current="page"]{background:var(--goal-soft);color:var(--goal);box-shadow:none}
+  .navico{display:block;width:22px;height:22px}
+  body.typing nav{display:none}
+  /* wizard */
+  .wizard{grid-template-columns:1fr;gap:12px}
+  .rail{display:none}
+  .rail.open{display:flex;position:static;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px}
+  .rail.open button{padding:10px;font-size:.95rem}
+  .mprog{display:flex;flex-direction:column;gap:8px}
+  .mtop{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.9rem;color:var(--muted)}
+  .mtop b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .pbar{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden}
+  .pbar i{display:block;height:100%;background:var(--goal);border-radius:3px;transition:width .25s}
+  .card{padding:20px 16px 0}
+  .stephead{gap:2px 14px;margin-bottom:12px}
+  .letter{font-size:3rem}
+  .help{font-size:.95rem;margin-bottom:16px}
+  .stepnav{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--surface);margin:20px -16px 0;padding:12px 16px;border-radius:0 0 14px 14px;flex-wrap:nowrap}
+  body.typing .stepnav{position:static}
+  .stepnav .btn{flex:1;min-height:48px;font-size:1rem}
+  .card > .discard{padding-bottom:12px}
+  .thought{padding:12px}
+  .chip{padding:7px 12px;font-size:.85rem}
+  .emo{grid-template-columns:minmax(0,1fr) 2.2em auto;row-gap:2px}
+  .emo input[type=range]{grid-column:1/-1;grid-row:2;height:34px}
+  .q{grid-template-columns:1fr;gap:8px;padding:10px 0}
+  .seg button{flex:1;min-height:42px;font-size:.95rem}
+  /* other views */
+  .sumgrid,.bal,.pgrid,.toolsgrid{grid-template-columns:1fr}
+  .sumcol.goal{border-left:0;border-top:2px solid var(--line)}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:last-child{grid-column:1/-1}
+  .row2{grid-template-columns:1fr}
+  .list{grid-template-columns:1fr}
+  .toolbar h2{font-size:1.35rem}
+  .panel{padding:16px}
+  .toast{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+  .foot{margin-top:28px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><h1>Dziennik RSA</h1><span>Racjonalna Samoanaliza · RTZ</span></div>
+    <nav aria-label="Widoki">
+      <button id="nav-new" data-view="new"><svg class="navico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Nowa analiza</button>
+      <button id="nav-log" data-view="log"><svg class="navico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3Z"/><path d="M8 9h6M8 13h6"/></svg>Dziennik</button>
+      <button id="nav-pat" data-view="pat"><svg class="navico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18"/><path d="M5 16l4-5 4 3 6-8"/></svg>Wzorce</button>
+    </nav>
+  </header>
+  <main id="app"></main>
+  <p class="foot">Formularz oparty na arkuszu RSA w opracowaniu Agnieszki Hottowy (Pracownia Racjonalnej Terapii Zachowania). Aplikacja służy do samopomocy i nie zastępuje pracy z terapeutą. Wpisy zapisują się tylko w tej przeglądarce, na tym urządzeniu.</p>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const KEY='rsa-dziennik-v1';
+const BELIEF_TAGS=['Żądania („muszę”, „powinnam/powinienem”)','Katastrofizacja („to okropne”)','Niska tolerancja frustracji („nie zniosę”)','Ocena siebie („jestem…”)','Ocena innych','Odrzucenie'];
+const QUESTIONS=['Czy ta myśl jest oparta na oczywistych faktach?','Czy ta myśl (najlepiej) chroni moje życie i zdrowie?','Czy ta myśl (najlepiej) pomaga mi osiągać moje bliższe i dalsze cele?','Czy ta myśl (najlepiej) pomaga mi unikać najbardziej niepożądanych konfliktów lub sobie z nimi radzić?','Czy ta myśl pomaga mi czuć się tak, jak chcę, bez nadużywania żadnych substancji?'];
+const QSHORT=['Fakty','Życie i zdrowie','Cele','Konflikty','Samopoczucie'];
+
+const STEPS=[
+ {k:'A',L:'A',n:'1',side:'now',r:'Sytuacja',t:'Co się wydarzyło?',h:'Opisz sytuację: co się wydarzyło albo co się teraz dzieje. Wystarczy kilka zdań.'},
+ {k:'C',L:'C',n:'2',side:'now',r:'Emocje',t:'Jakie emocje się pojawiły?',h:'Nazwij emocje i oceń ich natężenie od 1 do 10. Dopisz, co działo się w ciele.'},
+ {k:'D',L:'D',n:'3',side:'now',r:'Zachowanie',t:'Co zrobiłam / zrobiłem?',h:'Co rzeczywiście zrobiłeś/zrobiłaś w tej sytuacji? Albo co robisz teraz?'},
+ {k:'B',L:'B',n:'4',side:'now',r:'Myśli',t:'Jakie myśli się pojawiły?',h:'Przekonania, słowa, „wewnętrzne głosy”, komunikaty do siebie, obrazy, wspomnienia. Każdą myśl zapisz osobno. Możesz dodać jej temat, żeby później widzieć, co wraca.'},
+ {k:'plus',L:'+',n:'5',side:'bal',r:'Plusy reakcji',t:'Co dobrego daje mi ta reakcja?',h:'Dzięki temu, że tak reaguję… co dobrego się dzieje? Co dobrego ma się wydarzyć? Na co mam nadzieję?'},
+ {k:'minus',L:'−',n:'6',side:'bal',r:'Koszty reakcji',t:'Ile mnie to kosztuje?',h:'Negatywne konsekwencje emocji (C) i zachowania (D).'},
+ {k:'ZC',L:'ZC',n:'7',side:'goal',r:'Emocje docelowe',t:'Jak chcę się czuć?',h:'Jakie emocje chcesz odczuwać w takiej sytuacji i jak mocno? Jakie reakcje ciała im towarzyszą? Możesz je sobie wyobrazić albo przyjąć taką postawę.'},
+ {k:'ZD',L:'ZD',n:'8',side:'goal',r:'Zachowanie docelowe',t:'Co chcę zrobić?',h:'Jak chcesz się zachować w takiej sytuacji?'},
+ {k:'cost',L:'−',n:'9',side:'bal',r:'Koszty zmiany',t:'Co mogę stracić, zmieniając reakcję?',h:'Jeśli przestanę tak reagować albo zachowam się inaczej… co stracę? Co niedobrego się wydarzy?'},
+ {k:'gain',L:'+',n:'10',side:'bal',r:'Zyski ze zmiany',t:'Co zyskam dzięki zmianie?',h:'Dzięki nowej reakcji… co dobrego się wydarzy? Te odpowiedzi przydadzą się przy pisaniu zdrowych myśli (ZB).'},
+ {k:'ZA',L:'ZA',n:'11',side:'goal',r:'Test Kamery',t:'Test Kamery',h:'Co faktycznie się wydarzyło? Opisz tylko to, co nagrałaby kamera: kto co powiedział i zrobił. Bez ocen i domysłów.'},
+ {k:'Q',L:'5?',n:'✓',side:'check',r:'Pięć pytań',t:'Pięć Pytań Zdrowego Myślenia',h:'Zadaj te pytania osobno każdej myśli z B. Jeśli na większość odpowiadasz „nie”, ta myśl prawdopodobnie Ci nie służy.'},
+ {k:'ZB',L:'ZB',n:'12',side:'goal',r:'Zdrowe myśli',t:'Jakie myśli będą dla mnie pomocne?',h:'Do każdej myśli z B napisz myśl wspierającą: zgodną z faktami i pomocną w osiąganiu tego, czego chcesz.'},
+ {k:'S',L:'RSA',n:'',side:'sum',r:'Podsumowanie',t:'Twoja analiza',h:'Sprawdź całość. Lewa strona to „jak jest”, prawa to „jak chcę”.'}
+];
+
+const uid=()=>Math.random().toString(36).slice(2,10);
+const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const blankThought=()=>({text:'',tag:'',q:[null,null,null,null,null]});
+function blank(){return{id:uid(),date:today(),title:'',A:'',B:[blankThought()],C:{em:[{name:'',n:5}],body:'',impulse:''},D:'',plus:[''],minus:[''],ZC:{em:[{name:'',n:3}],body:''},ZD:'',cost:[''],gain:[''],ZA:'',ZB:[''],example:false}}
+
+function samples(){
+ const t=(text,tag,q)=>({text,tag,q});
+ return [
+ {id:'ex1',example:true,date:'2026-10-06',title:'Uwagi promotora do rozdziału',A:'Dostałam maila z uwagami do rozdziału. Było ich dużo.',B:[t('Muszę oddać idealny tekst, inaczej się skompromituję.',BELIEF_TAGS[0],[false,false,false,true,false]),t('Nie nadaję się do pisania pracy.',BELIEF_TAGS[3],[false,true,false,true,false])],C:{em:[{name:'wstyd',n:8},{name:'lęk',n:7}],body:'ścisk w żołądku, zgarbiona postawa',impulse:'zamknąć laptopa'},D:'Zamknęłam pocztę i przez dwa dni nie otwierałam pliku.',plus:['Nie muszę od razu czuć się źle, czytając uwagi.'],minus:['Termin się zbliża.','Wstyd rośnie z każdym dniem.'],ZC:{em:[{name:'rozczarowanie',n:4},{name:'spokój',n:6}],body:'wyprostowane plecy, spokojny oddech'},ZD:'Przeczytać uwagi i rozpisać je na listę zadań.',cost:['Będę musiała zmierzyć się z tym, co jest do poprawy.'],gain:['Szybciej skończę rozdział.'],ZA:'Promotor napisał 14 komentarzy. Większość dotyczy formatowania i cytowań. Na końcu napisał: „Dobry kierunek”.',ZB:['Chcę oddać dobry tekst. Poprawki są normalną częścią pisania.','Dostaję uwagi, bo piszę. To znaczy, że praca idzie do przodu.']},
+ {id:'ex2',example:true,date:'2026-10-14',title:'Znajomy nie odpisał od dwóch dni',A:'Napisałam do znajomego w sobotę. Jest poniedziałek, nadal brak odpowiedzi.',B:[t('Pewnie ma mnie dość.',BELIEF_TAGS[5],[false,true,false,false,false])],C:{em:[{name:'lęk',n:7},{name:'smutek',n:6}],body:'niepokój, sprawdzanie telefonu',impulse:'napisać jeszcze raz'},D:'Co godzinę sprawdzałam telefon.',plus:['Mam poczucie, że trzymam rękę na pulsie.'],minus:['Nie mogę się skupić na nauce.'],ZC:{em:[{name:'ciekawość',n:4},{name:'spokój',n:6}],body:'luźne ramiona'},ZD:'Zająć się swoimi sprawami, odezwać się za kilka dni.',cost:['Mogę przegapić odpowiedź.'],gain:['Więcej czasu i spokoju.'],ZA:'Wysłałam jedną wiadomość. Nie dostałam odpowiedzi przez dwa dni.',ZB:['Nie wiem, dlaczego nie odpisał. Ludzie bywają zajęci.']},
+ {id:'ex3',example:true,date:'2026-10-22',title:'Spóźniony autobus przed egzaminem',A:'Autobus spóźniał się 20 minut, a za godzinę zaczynał się egzamin.',B:[t('Nie zniosę tego, to jest okropne.',BELIEF_TAGS[2],[false,false,false,true,false]),t('Muszę zawsze być na czas.',BELIEF_TAGS[0],[false,true,false,true,false])],C:{em:[{name:'złość',n:8},{name:'lęk',n:5}],body:'napięte szczęki, szybki oddech',impulse:'kłócić się z kierowcą'},D:'Chodziłam nerwowo po przystanku.',plus:['Złość daje mi energię.'],minus:['Byłam zmęczona już przed egzaminem.'],ZC:{em:[{name:'irytacja',n:4}],body:'spokojny, głęboki oddech'},ZD:'Sprawdzić inne połączenie, powtórzyć notatki.',cost:['Mogę wyjść na osobę, której nie zależy.'],gain:['Przyjdę na egzamin spokojniejsza.'],ZA:'Autobus spóźnił się 20 minut. Dotarłam 15 minut przed egzaminem.',ZB:['To nieprzyjemne, ale do zniesienia. Mam jeszcze czas.','Wolę być na czas, ale spóźnienia się zdarzają.']},
+ {id:'ex4',example:true,date:'2026-10-29',title:'Prezentacja na zajęciach',A:'Za godzinę miałam prezentację przed grupą.',B:[t('Muszę wypaść bezbłędnie.',BELIEF_TAGS[0],[false,true,false,true,false]),t('Wszyscy zobaczą, że się nie nadaję.',BELIEF_TAGS[3],[false,true,false,true,false])],C:{em:[{name:'lęk',n:6}],body:'drżące ręce'},D:'Powtarzałam slajdy w kółko.',plus:['Czuję, że się przygotowuję.'],minus:['Zmęczenie, sucho w gardle.'],ZC:{em:[{name:'tremo',n:4},{name:'spokój',n:5}],body:'stabilna postawa, oddech przeponowy'},ZD:'Raz przejrzeć slajdy, potem zrobić przerwę.',cost:['Mogę o czymś zapomnieć.'],gain:['Będę mieć więcej siły na samo wystąpienie.'],ZA:'Wystąpiłam przez 10 minut. Raz się pomyliłam i poprawiłam. Dwie osoby zadały pytania.',ZB:['Chcę wypaść dobrze. Drobne pomyłki są w porządku.','Jedna prezentacja nie mówi o mnie wszystkiego.']}
+ ];
+}
+
+let S={entries:[],draft:null,editing:null,step:0};
+let view='new', openId=null, railOpen=false;
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.entries)){S=Object.assign(S,s);return}}catch(e){}S.entries=samples();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({entries:S.entries,draft:S.draft,editing:S.editing,step:S.step}))}catch(e){}}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2200)}
+
+function getP(o,p){return p.split('.').reduce((a,k)=>a==null?a:a[k],o)}
+function setP(o,p,v){const ks=p.split('.');const last=ks.pop();const t=ks.reduce((a,k)=>a[k],o);t[last]=v}
+function draft(){if(!S.draft){S.draft=blank();S.step=0}return S.draft}
+
+/* ---------- field builders ---------- */
+const ta=(p,label,ph,rows=3,sub='')=>`<label class="f">${label}${sub?` <small>${sub}</small>`:''}<textarea id="f-${p}" data-path="${p}" rows="${rows}" placeholder="${h(ph)}">${h(getP(S.draft,p))}</textarea></label>`;
+function strList(p,label,sign,ph){
+ const arr=getP(S.draft,p);
+ return `<div class="fields" style="gap:10px"><div class="eyebrow">${label}</div>${arr.map((v,i)=>`<div class="listitem"><span class="tag">${sign}</span><textarea id="f-${p}-${i}" rows="2" data-path="${p}.${i}" placeholder="${h(ph)}">${h(v)}</textarea><button class="xbtn" data-act="del" data-path="${p}" data-i="${i}" aria-label="Usuń">×</button></div>`).join('')}<button class="btn small add" data-act="add" data-path="${p}">+ Dodaj kolejną</button></div>`;
+}
+function emoList(p){
+ const arr=getP(S.draft,p);
+ return `<div class="fields" style="gap:10px"><div class="eyebrow">Emocje i natężenie (1–10)</div>${arr.map((e,i)=>`<div class="emo"><input type="text" id="f-${p}-${i}" data-path="${p}.${i}.name" value="${h(e.name)}" placeholder="np. lęk, złość, wstyd" list="emolist"><input type="range" id="r-${p}-${i}" min="1" max="10" data-path="${p}.${i}.n" value="${e.n}" aria-label="Natężenie"><output>${e.n}</output><button class="xbtn" data-act="del" data-path="${p}" data-i="${i}" aria-label="Usuń emocję">×</button></div>`).join('')}<button class="btn small add" data-act="add" data-path="${p}">+ Dodaj emocję</button></div>`;
+}
+function quickB(){return `<div class="note"><span>Czy myśli o tych konsekwencjach zmotywowały Cię do takiej reakcji (C lub D)? Jeśli tak, dopisz je do myśli B.</span><div class="inline"><input type="text" id="quickB" placeholder="np. Jak odpuszczę, to nikt mnie nie uszanuje"><button class="btn small" data-act="quickB">Dopisz do B</button></div></div>`}
+
+function allTags(){const s=new Set(BELIEF_TAGS);S.entries.forEach(e=>e.B.forEach(b=>b.tag&&s.add(b.tag)));return [...s]}
+
+function stepBody(st){
+ const d=S.draft;
+ switch(st.k){
+  case 'A':return `<div class="row2"><label class="f">Krótka nazwa sytuacji<input type="text" id="f-title" data-path="title" value="${h(d.title)}" placeholder="np. Kłótnia przy kolacji"></label><label class="f">Data<input type="date" id="f-date" data-path="date" value="${h(d.date)}"></label></div>${ta('A','Co się wydarzyło? Co się dzieje?','Opisz sytuację własnymi słowami…',5)}`;
+  case 'C':return emoList('C.em')+ta('C.body','Jakie reakcje ciała im towarzyszą?','Fizyczne odczucia, postawa ciała, mimika…',2)+ta('C.impulse','Jakie impulsy do działania się pojawiły?','Co chciałeś/chciałaś zrobić?',2,'opcjonalnie');
+  case 'D':return ta('D','Co rzeczywiście zrobiłam / zrobiłem?','Opisz swoje zachowanie…',4);
+  case 'B':{const tags=allTags();return `${d.B.map((b,i)=>`<div class="thought"><div class="top"><span class="lbl">B${i+1}</span>${d.B.length>1?`<button class="xbtn" data-act="delB" data-i="${i}" aria-label="Usuń myśl B${i+1}">×</button>`:''}</div><textarea id="f-B-${i}" rows="2" data-path="B.${i}.text" placeholder="Co dokładnie sobie mówisz?">${h(b.text)}</textarea><label class="f" style="font-weight:500">Temat / schemat <small>opcjonalnie, pomaga śledzić wzorce</small><input type="text" id="t-B-${i}" data-path="B.${i}.tag" value="${h(b.tag)}" list="taglist" placeholder="Wpisz albo wybierz poniżej"></label><div class="chips">${tags.slice(0,8).map(t=>`<button class="chip" data-act="tag" data-i="${i}" data-v="${h(t)}">${h(t)}</button>`).join('')}</div></div>`).join('')}<button class="btn small add" data-act="addB">+ Dodaj myśl</button>`}
+  case 'plus':return strList('plus','Pozytywne konsekwencje C i D','+','Dzięki temu…')+quickB();
+  case 'minus':return strList('minus','Negatywne konsekwencje C i D','−','Przez to…');
+  case 'ZC':return emoList('ZC.em')+ta('ZC.body','Jakie reakcje ciała towarzyszą tym emocjom?','Wyobraź sobie je, „poczuj”, przyjmij taką postawę…',2);
+  case 'ZD':return ta('ZD','Co chcę zrobić w takiej sytuacji?','Opisz zachowanie, które chcesz wybrać…',4);
+  case 'cost':return strList('cost','Przewidywane koszty zmiany','−','Jeśli zachowam się inaczej, to…')+quickB().replace('Czy myśli o tych konsekwencjach zmotywowały Cię do takiej reakcji (C lub D)? Jeśli tak, dopisz je do myśli B.','Czy pojawiły się myśli, które „namawiają” Cię do starej reakcji? Jeśli tak, dopisz je do myśli B.');
+  case 'gain':return strList('gain','Przewidywane korzyści zmiany','+','Dzięki temu…');
+  case 'ZA':return `<div class="pairB"><b>A</b>${h(d.A)||'<span class="empty">Nie opisano jeszcze sytuacji.</span>'}</div>`+ta('ZA','Co faktycznie się wydarzyło?','Tylko fakty, które dałoby się nagrać…',5);
+  case 'Q':{const bs=d.B.map((b,i)=>[b,i]).filter(([b])=>b.text.trim());if(!bs.length)return `<p class="empty">Najpierw zapisz myśli w kroku 4 (B).</p>`;
+   return bs.map(([b,i])=>`<div class="thought"><div class="pairB" style="background:none;padding:0"><b>B${i+1}</b>${h(b.text)}</div><div class="qgrid">${QUESTIONS.map((q,qi)=>`<div class="q"><span>${qi+1}. ${q}</span><div class="seg" role="group"><button class="yes" data-act="q" data-i="${i}" data-qi="${qi}" data-v="1" aria-pressed="${b.q[qi]===true}">Tak</button><button class="no" data-act="q" data-i="${i}" data-qi="${qi}" data-v="0" aria-pressed="${b.q[qi]===false}">Nie</button></div></div>`).join('')}</div></div>`).join('')}
+  case 'ZB':{while(d.ZB.length<d.B.length)d.ZB.push('');const gains=d.gain.filter(x=>x.trim());
+   return (gains.length?`<div class="note"><span><b>Twoje zyski ze zmiany</b> (krok 10) mogą podpowiedzieć zdrowe myśli:</span><span>${gains.map(g=>'+ '+h(g)).join('<br>')}</span></div>`:'')+d.B.map((b,i)=>`<div class="thought"><div class="pairB"><b>B${i+1}</b>${h(b.text)||'<span class="empty">pusta myśl</span>'}</div><label class="f"><span style="color:var(--goal);font-family:var(--display);font-weight:400;font-size:1.1rem">ZB${i+1}</span><textarea id="f-ZB-${i}" rows="2" data-path="ZB.${i}" placeholder="Pomocna, wspierająca myśl…">${h(d.ZB[i])}</textarea></label></div>`).join('')}
+  case 'S':return summary(d,true);
+ }
+}
+
+function emoTxt(em){const f=em.filter(e=>e.name.trim());return f.length?f.map(e=>`${h(e.name)} <b>${e.n}</b>/10`).join(', '):''}
+const para=v=>v&&String(v).trim()?`<p>${h(v)}</p>`:'<p class="empty">—</p>';
+function summary(d,editable){
+ const bl=d.B.filter(b=>b.text.trim());
+ const lst=a=>{const f=a.filter(x=>x.trim());return f.length?`<ul>${f.map(x=>`<li>${h(x)}</li>`).join('')}</ul>`:'<p class="empty">—</p>'};
+ return `<div class="sumgrid"><div class="sumcol now"><h3>Jak jest</h3>
+ <div class="sumcell"><div class="k">1 · A · Sytuacja</div>${para(d.A)}</div>
+ <div class="sumcell"><div class="k">4 · B · Myśli</div>${bl.length?bl.map((b,i)=>`<p><b>B${i+1}.</b> ${h(b.text)}${b.tag?` <span class="pill">${h(b.tag.split(' (')[0])}</span>`:''}</p>`).join(''):'<p class="empty">—</p>'}</div>
+ <div class="sumcell"><div class="k">2 · C · Emocje i ciało</div>${emoTxt(d.C.em)?`<p>${emoTxt(d.C.em)}</p>`:''}${para(d.C.body)}</div>
+ <div class="sumcell"><div class="k">3 · D · Zachowanie</div>${para(d.D)}</div>
+ </div><div class="sumcol goal"><h3>Jak chcę</h3>
+ <div class="sumcell"><div class="k">11 · ZA · Test Kamery</div>${para(d.ZA)}</div>
+ <div class="sumcell"><div class="k">12 · ZB · Zdrowe myśli</div>${d.ZB.filter(x=>x.trim()).length?d.ZB.map((z,i)=>z.trim()?`<p><b>ZB${i+1}.</b> ${h(z)}</p>`:'').join(''):'<p class="empty">—</p>'}</div>
+ <div class="sumcell"><div class="k">7 · ZC · Emocje docelowe</div>${emoTxt(d.ZC.em)?`<p>${emoTxt(d.ZC.em)}</p>`:''}${para(d.ZC.body)}</div>
+ <div class="sumcell"><div class="k">8 · ZD · Zachowanie docelowe</div>${para(d.ZD)}</div>
+ </div></div>
+ <div class="bal"><div class="balbox"><div class="k">Bilans 1 · stara reakcja</div><b>Plusy</b>${lst(d.plus)}<b>Koszty</b>${lst(d.minus)}</div>
+ <div class="balbox"><div class="k">Bilans 2 · zmiana</div><b>Koszty zmiany</b>${lst(d.cost)}<b>Zyski ze zmiany</b>${lst(d.gain)}</div></div>`;
+}
+
+/* ---------- views ---------- */
+function renderNew(){
+ draft();const st=STEPS[S.step];
+ const rail=STEPS.map((s,i)=>(i===4?'<div class="sep">Bilans i cel</div>':i===10?'<div class="sep">Sprawdzenie</div>':i===0?'<div class="sep">Jak jest</div>':'')+`<button class="s-${s.side}" data-act="go" data-i="${i}" ${i===S.step?'aria-current="step"':''}><span class="num">${s.n||'·'}</span><span>${s.k.length<=2&&/^[A-Z]/.test(s.k)?`<b>${s.k}</b> `:''}${s.r}</span></button>`).join('');
+ const pct=Math.round(S.step/(STEPS.length-1)*100);
+ const mprog=`<div class="mprog"><div class="mtop"><span><b>${st.n&&st.n!=='✓'?st.n+' / 12':st.k==='Q'?'11 / 12':'12 / 12'}</b> · ${st.r}</span><button class="btn small" data-act="toggleRail" aria-expanded="${railOpen}">${railOpen?'Zamknij listę':'Wszystkie kroki'}</button></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>`;
+ return `<div class="wizard">${mprog}<aside class="rail${railOpen?' open':''}" aria-label="Kroki">${rail}</aside>
+ <section class="card side-${st.side}"><div class="stephead"><div class="letter" aria-hidden="true">${st.L}</div><div class="eyebrow">${st.n&&st.n!=='✓'?'Krok '+st.n+' z 12':st.k==='Q'?'Sprawdzenie myśli':'Gotowe'}${S.editing?' · edycja wpisu':''}</div><h2>${st.t}</h2></div>
+ <p class="help">${st.h}</p><div class="fields">${stepBody(st)}</div>
+ <div class="stepnav">${S.step>0?'<button class="btn" data-act="prev">← Wstecz</button>':''}
+ ${S.step<STEPS.length-1?'<button class="btn primary" data-act="next">Dalej →</button>':'<button class="btn primary" data-act="saveEntry">Zapisz</button>'}</div>
+ <div class="discard"><button class="btn ghost small" data-act="discard">Wyczyść formularz</button></div></section></div>
+ <datalist id="taglist">${allTags().map(t=>`<option value="${h(t)}">`).join('')}</datalist>
+ <datalist id="emolist">${['lęk','złość','smutek','wstyd','poczucie winy','zazdrość','rozczarowanie','irytacja','niepokój','spokój','ciekawość','radość','żal'].map(t=>`<option value="${t}">`).join('')}</datalist>`;
+}
+
+const fmt=d=>{try{return new Date(d+'T12:00').toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'})}catch(e){return d}};
+const maxN=em=>Math.max(0,...em.filter(e=>e.name.trim()).map(e=>+e.n));
+function sorted(){return [...S.entries].sort((a,b)=>b.date.localeCompare(a.date))}
+
+function renderLog(){
+ if(openId){const e=S.entries.find(x=>x.id===openId);if(e)return `<div class="toolbar"><button class="btn ghost" data-act="close">← Dziennik</button><div style="display:flex;gap:8px;flex-wrap:wrap" id="entryActions"><button class="btn" data-act="edit" data-id="${e.id}">Edytuj</button><button class="btn danger" data-act="askDel">Usuń</button></div></div>
+  <div class="card"><div class="eyebrow">${fmt(e.date)}${e.example?' <span class="pill ex">przykład</span>':''}</div><h2 style="font-size:1.8rem;margin:4px 0 18px">${h(e.title||'Bez nazwy')}</h2>${summary(e)}</div>`;openId=null}
+ const ex=S.entries.some(e=>e.example);
+ const items=sorted();
+ return `<div class="toolbar"><h2>Dziennik analiz</h2><button class="btn primary" data-act="newEntry">+ Nowa analiza</button></div>
+ ${ex?`<div class="banner"><span>Widzisz przykładowe wpisy, żeby zobaczyć, jak działa dziennik i wzorce.</span><button class="btn small" data-act="clearEx">Usuń przykłady</button></div>`:''}
+ ${items.length?`<div class="list">${items.map(e=>{const c=maxN(e.C.em),z=maxN(e.ZC.em),b=e.B.find(x=>x.text.trim());return `<button class="entry" data-act="open" data-id="${e.id}"><span class="d">${fmt(e.date)}${e.example?' <span class="pill ex">przykład</span>':''}</span><h3>${h(e.title||'Bez nazwy')}</h3>${b?`<span class="bline">„${h(b.text)}”</span>`:''}<span class="meter">C<span class="bar"><i style="width:${c*10}%"></i></span>${c}</span><span class="meter">ZC<span class="bar"><i class="g" style="width:${z*10}%"></i></span>${z}</span></button>`}).join('')}</div>`:`<div class="card"><h3>Dziennik jest pusty</h3><p class="help">Gdy zapiszesz pierwszą analizę, pojawi się tutaj.</p><button class="btn primary" data-act="newEntry">Zacznij pierwszą analizę</button></div>`}
+ <details class="tools"><summary>Kopia zapasowa danych</summary><p class="help" style="margin-top:8px">Dane są tylko w tej przeglądarce. Skopiuj je, żeby przenieść na inne urządzenie albo zachować kopię.</p>
+ <div class="toolsgrid"><div class="fields" style="gap:8px"><textarea id="exportBox" readonly>${h(JSON.stringify(S.entries))}</textarea><button class="btn small add" data-act="copy">Kopiuj dane</button></div>
+ <div class="fields" style="gap:8px"><textarea id="importBox" placeholder="Wklej tu skopiowane dane…"></textarea><button class="btn small add" data-act="import">Wczytaj dane</button></div></div></details>`;
+}
+
+function renderPat(){
+ const E=[...S.entries].sort((a,b)=>a.date.localeCompare(b.date));
+ if(!E.length)return `<div class="card"><h3>Brak danych do analizy</h3><p class="help">Wzorce pojawią się po zapisaniu kilku analiz.</p></div>`;
+ const tags={},emos={},qn=[0,0,0,0,0],qa=[0,0,0,0,0],groups={};
+ E.forEach(e=>{e.B.forEach(b=>{if(!b.text.trim())return;const t=b.tag.trim()||'Bez tematu';tags[t]=(tags[t]||0)+1;(groups[t]=groups[t]||[]).push({text:b.text,date:e.date});b.q.forEach((v,i)=>{if(v!==null){qa[i]++;if(v===false)qn[i]++}})});e.C.em.forEach(m=>{const n=m.name.trim().toLowerCase();if(n)emos[n]=(emos[n]||0)+1})});
+ const tagArr=Object.entries(tags).sort((a,b)=>b[1]-a[1]);const emoArr=Object.entries(emos).sort((a,b)=>b[1]-a[1]).slice(0,6);
+ const avg=(E.reduce((s,e)=>s+maxN(e.C.em),0)/E.length).toFixed(1).replace('.',',');
+ const tmax=tagArr[0]?tagArr[0][1]:1,emax=emoArr[0]?emoArr[0][1]:1;
+ const ex=E.some(e=>e.example);
+ return `<div class="toolbar"><h2>Wzorce w czasie</h2></div>
+ ${ex?`<div class="banner"><span>Statystyki obejmują przykładowe wpisy.</span><button class="btn small" data-act="clearEx">Usuń przykłady</button></div>`:''}
+ <div class="stats"><div class="stat"><div class="v">${E.length}</div><div class="l">zapisanych analiz</div></div><div class="stat"><div class="v">${avg}</div><div class="l">średnie najwyższe natężenie emocji (C)</div></div><div class="stat"><div class="v" style="font-size:1.2rem;padding-top:8px">${tagArr[0]?h(tagArr[0][0].split(' (')[0]):'—'}</div><div class="l">najczęstszy temat myśli</div></div></div>
+ <div class="pgrid">
+ <div class="panel wide"><h3>Natężenie emocji: jak jest i jak chcę</h3><p class="sub">Najwyższe natężenie w każdej analizie. Gdy linie się zbliżają, różnica między reakcją a celem maleje.</p><div class="chartbox">${chart(E)}</div><div class="legend"><span><i style="background:var(--now)"></i>C · jak jest</span><span><i style="background:var(--goal)"></i>ZC · jak chcę</span></div></div>
+ <div class="panel"><h3>Tematy myśli, które wracają</h3><p class="sub">Na podstawie tematów przypisanych myślom B.</p>${tagArr.map(([t,n])=>`<div class="hbar"><span class="t" title="${h(t)}">${h(t)}</span><span class="b"><i style="width:${n/tmax*100}%"></i></span><span class="n">${n}</span></div>`).join('')}</div>
+ <div class="panel"><h3>Najczęstsze emocje</h3><p class="sub">Ile razy emocja pojawiła się w kroku C.</p>${emoArr.map(([t,n])=>`<div class="hbar"><span class="t">${h(t)}</span><span class="b"><i style="width:${n/emax*100}%"></i></span><span class="n">${n}</span></div>`).join('')}</div>
+ <div class="panel"><h3>Gdzie myśli najczęściej nie przechodzą testu</h3><p class="sub">Odsetek odpowiedzi „nie” w Pięciu Pytaniach.</p>${QSHORT.map((q,i)=>{const p=qa[i]?Math.round(qn[i]/qa[i]*100):0;return `<div class="hbar"><span class="t">${i+1}. ${q}</span><span class="b"><i class="bal" style="width:${p}%"></i></span><span class="n">${qa[i]?p+'%':'—'}</span></div>`}).join('')}</div>
+ <div class="panel"><h3>Powtarzające się myśli</h3><p class="sub">Pogrupowane według tematu. To kandydaci na głębsze przekonania.</p><div class="recur">${tagArr.slice(0,4).map(([t])=>`<div class="grp"><b>${h(t.split(' (')[0])}</b><ul>${groups[t].map(g=>`<li>${h(g.text)} <span>${g.date.slice(8)}.${g.date.slice(5,7)}</span></li>`).join('')}</ul></div>`).join('')}</div></div>
+ <div class="panel wide"><h3>W kolejnych wersjach</h3><p class="sub">Pomysły na rozwój obszaru długofalowej pracy ze schematami.</p><div class="roadmap">
+ ${[['Mapa przekonań bazowych','Łączenie podobnych myśli B w jedno przekonanie i śledzenie, jak często wraca i w jakich sytuacjach.'],['Siła przekonania w czasie','Ocena „na ile w to wierzę” (0–100%) dla B i ZB przy każdym powrocie do tematu.'],['Biblioteka zdrowych myśli','Zapisane ZB do ponownego użycia, z oceną, które naprawdę pomagały.'],['Wyzwalacze sytuacji','Kategorie dla A (studia, relacje, zdrowie) i porównanie, które sytuacje uruchamiają który schemat.'],['Zadania między analizami','Małe eksperymenty sprawdzające przewidywania, podpięte do konkretnego schematu.'],['Przegląd tygodnia i miesiąca','Krótkie podsumowanie z pytaniami do refleksji i zmianą natężenia w czasie.'],['Eksport dla terapeuty','Czytelny raport z wybranych analiz do omówienia na sesji.'],['Synchronizacja','Bezpieczne przechowywanie danych na wielu urządzeniach.']].map(([a,b])=>`<div class="idea"><b>${a}</b>${b}</div>`).join('')}
+ </div></div></div>`;
+}
+
+function chart(E){
+ if(E.length<2)return '<p class="empty">Wykres pojawi się po co najmniej dwóch analizach.</p>';
+ const W=Math.round(Math.max(300,Math.min(640,(app.clientWidth||640)-36))),H=W<480?200:220,L=30,R=14,T=12,B=30,iw=W-L-R,ih=H-T-B;
+ const every=Math.max(1,Math.ceil(E.length*46/iw));
+ const x=i=>L+(E.length===1?iw/2:i*iw/(E.length-1)),y=v=>T+ih-(v/10)*ih;
+ const line=(f,c)=>{const pts=E.map((e,i)=>[x(i),y(f(e))]);return `<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>`+pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--surface)" stroke="${c}" stroke-width="2"/>`).join('')};
+ let g='';[0,2,4,6,8,10].forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`});
+ E.forEach((e,i)=>{if(i%every)return;g+=`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${e.date.slice(8)}.${e.date.slice(5,7)}</text>`});
+ return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Natężenie emocji w kolejnych analizach">${g}${line(e=>maxN(e.ZC.em),'var(--goal)')}${line(e=>maxN(e.C.em),'var(--now)')}</svg>`;
+}
+
+/* ---------- render & events ---------- */
+const app=document.getElementById('app');
+function render(){
+ document.querySelectorAll('nav button').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+ app.innerHTML=view==='new'?renderNew():view==='log'?renderLog():renderPat();
+}
+function go(v){view=v;render();window.scrollTo({top:0})}
+function defFor(p){return p==='B'?blankThought():/em$/.test(p)?{name:'',n:5}:''}
+
+document.querySelector('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.view)});
+app.addEventListener('input',e=>{const el=e.target;const p=el.dataset.path;if(!p||!S.draft)return;let v=el.value;if(el.type==='range'){v=+v;const o=el.parentNode.querySelector('output');if(o)o.textContent=v}setP(S.draft,p,v);save()});
+app.addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,d=S.draft;
+ const i=+b.dataset.i;
+ switch(a){
+  case 'go':S.step=i;railOpen=false;break;
+  case 'toggleRail':railOpen=!railOpen;render();return;
+  case 'next':S.step=Math.min(STEPS.length-1,S.step+1);window.scrollTo({top:0});break;
+  case 'prev':S.step=Math.max(0,S.step-1);window.scrollTo({top:0});break;
+  case 'add':getP(d,b.dataset.path).push(defFor(b.dataset.path));break;
+  case 'del':{const arr=getP(d,b.dataset.path);arr.splice(i,1);if(!arr.length)arr.push(defFor(b.dataset.path));break}
+  case 'addB':d.B.push(blankThought());d.ZB.push('');break;
+  case 'delB':d.B.splice(i,1);d.ZB.splice(i,1);break;
+  case 'tag':d.B[i].tag=b.dataset.v;break;
+  case 'quickB':{const inp=document.getElementById('quickB');const v=inp.value.trim();if(!v)return;const empty=d.B.find(x=>!x.text.trim());if(empty)empty.text=v;else{d.B.push(Object.assign(blankThought(),{text:v}));d.ZB.push('')}toast('Dopisano do myśli B');break}
+  case 'q':{const q=d.B[i].q,qi=+b.dataset.qi,v=b.dataset.v==='1';q[qi]=q[qi]===v?null:v;break}
+  case 'discard':if(b.dataset.sure){S.draft=null;S.editing=null;S.step=0;toast('Formularz wyczyszczony')}else{b.dataset.sure='1';b.textContent='Na pewno? Kliknij jeszcze raz';b.classList.add('danger');return}break;
+  case 'saveEntry':{const copy=JSON.parse(JSON.stringify(d));copy.example=false;if(S.editing){const k=S.entries.findIndex(x=>x.id===S.editing);if(k>=0)S.entries[k]=copy;else S.entries.push(copy)}else S.entries.push(copy);S.draft=null;S.editing=null;S.step=0;save();toast('Zapisano w dzienniku');openId=copy.id;view='log';break}
+  case 'newEntry':view='new';break;
+  case 'open':openId=b.dataset.id;break;
+  case 'close':openId=null;break;
+  case 'edit':{const en=S.entries.find(x=>x.id===b.dataset.id);S.draft=JSON.parse(JSON.stringify(en));S.editing=en.id;S.step=0;view='new';break}
+  case 'askDel':{const box=document.getElementById('entryActions');const id=box.querySelector('[data-act=edit]').dataset.id;box.innerHTML=`<span style="align-self:center;font-size:.9rem">Usunąć ten wpis na stałe?</span><button class="btn" data-act="open" data-id="${id}">Anuluj</button><button class="btn danger" data-act="del2" data-id="${id}">Usuń wpis</button>`;return}
+  case 'del2':S.entries=S.entries.filter(x=>x.id!==b.dataset.id);openId=null;toast('Wpis usunięty');break;
+  case 'clearEx':S.entries=S.entries.filter(x=>!x.example);toast('Przykłady usunięte');break;
+  case 'copy':{const box=document.getElementById('exportBox');const done=()=>toast('Skopiowano');try{navigator.clipboard.writeText(box.value).then(done,()=>{box.select();toast('Zaznaczono tekst. Skopiuj go skrótem klawiszowym.')})}catch(err){box.select()}return}
+  case 'import':{try{const arr=JSON.parse(document.getElementById('importBox').value);if(!Array.isArray(arr))throw 0;let n=0;arr.forEach(x=>{if(x&&x.id&&Array.isArray(x.B)){const k=S.entries.findIndex(y=>y.id===x.id);if(k>=0)S.entries[k]=x;else S.entries.push(x);n++}});toast('Wczytano wpisów: '+n)}catch(err){toast('Nie udało się wczytać. Sprawdź, czy wklejono cały tekst kopii.');return}break}
+ }
+ save();render();
+ if(a==='open'||a==='close'||a==='go')window.scrollTo({top:0});
+});
+
+/* hide bottom bar while the keyboard is open */
+const TYPE='textarea,input[type=text],input[type=date]';
+document.addEventListener('focusin',e=>{if(e.target.matches&&e.target.matches(TYPE))document.body.classList.add('typing')});
+document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(!a||!a.matches||!a.matches(TYPE))document.body.classList.remove('typing')},60));
+let rz;window.addEventListener('resize',()=>{if(view!=='pat')return;clearTimeout(rz);rz=setTimeout(render,200)});
+
+load();
+if(S.draft)view='new';
+render();
+})();
+</script>
+</body>
+</html>
