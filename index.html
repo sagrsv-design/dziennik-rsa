@@ -135,12 +135,8 @@ textarea:focus,input:focus{border-color:var(--goal);outline:none;background:var(
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:.85rem;cursor:pointer;color:var(--muted);min-height:36px;display:inline-flex;align-items:center;gap:6px;text-align:left}
 .chip:hover{border-color:var(--now);color:var(--now)}
 .chip.on{background:var(--now);border-color:var(--now);color:var(--surface)}
-.chip.sug:not(.on){border-style:dashed;border-color:var(--now);color:var(--now)}
-.chip.sug::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex:0 0 auto}
 .chip.g:hover{border-color:var(--goal);color:var(--goal)}
 .chip.qc.on{background:var(--bal);border-color:var(--bal);color:var(--surface)}
-.distdesc{font-size:.86rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
-.distdesc b{color:var(--ink);font-weight:600}
 .emo{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 2.2em auto;gap:10px;align-items:center}
 .emo output{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
 input[type=range]{width:100%;accent-color:var(--now)}
@@ -175,8 +171,6 @@ details.more summary::-webkit-details-marker{display:none}
 details.more summary::after{content:"+";color:var(--muted);font-weight:400;font-size:1.2rem;line-height:1}
 details.more[open] summary::after{content:"−"}
 details.more .in{padding:0 14px 14px;font-size:.92rem;display:flex;flex-direction:column;gap:8px}
-.glos dt{font-weight:600;margin-top:6px}
-.glos dd{margin:0;color:var(--muted)}
 .pill{font-family:var(--body);display:inline-block;font-size:.74rem;padding:1px 8px;border-radius:999px;background:var(--now-soft);color:var(--now);font-weight:600;vertical-align:1px;white-space:nowrap}
 .pill.goal{background:var(--goal-soft);color:var(--goal)}
 .pill.ex{background:var(--bal-soft);color:var(--bal)}
@@ -254,7 +248,7 @@ details.backup summary{cursor:pointer;font-weight:600;color:var(--muted)}
 .change b{color:var(--ink)}
 
 /* patterns */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
 .stat .v{font-family:var(--display);font-size:1.9rem;line-height:1.1;font-variant-numeric:tabular-nums}
 .stat .v.sm{font-size:1.15rem;padding-top:8px}
@@ -331,6 +325,7 @@ details.backup summary{cursor:pointer;font-weight:600;color:var(--muted)}
   .sumgrid,.bal,.pgrid,.toolsgrid{grid-template-columns:1fr}
   .sumcol.goal{border-left:0;border-top:2px solid var(--line)}
   .stats{grid-template-columns:1fr 1fr}
+  .stat:last-child{grid-column:1/-1}
   .row2{grid-template-columns:1fr 1fr}
   .row2.stack1{grid-template-columns:1fr}
   .list{grid-template-columns:1fr}
@@ -354,14 +349,14 @@ details.backup summary{cursor:pointer;font-weight:600;color:var(--muted)}
     </nav>
   </header>
   <main id="app"></main>
-  <p class="foot">Formularz oparty na arkuszu i instrukcji RSA w opracowaniu Agnieszki Hottowy (Pracownia Racjonalnej Terapii Zachowania). Lista zniekształceń poznawczych i eksperymenty behawioralne pochodzą z terapii poznawczo-behawioralnej. Aplikacja służy do samopomocy i nie zastępuje pracy z terapeutą. Wpisy zapisują się tylko w tej przeglądarce, na tym urządzeniu.</p>
+  <p class="foot">Formularz oparty na arkuszu i instrukcji RSA w opracowaniu Agnieszki Hottowy (Pracownia Racjonalnej Terapii Zachowania). Eksperymenty behawioralne pochodzą z terapii poznawczo-behawioralnej. Aplikacja służy do samopomocy i nie zastępuje pracy z terapeutą. Wpisy zapisują się tylko w tej przeglądarce, na tym urządzeniu.</p>
 </div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
 (function(){
 const KEY='rsa-dziennik-v1';
-const VER=2;
+const VER=3;
 
 /* ---------- treści ---------- */
 const QUESTIONS=['Czy ta myśl jest oparta na oczywistych faktach?','Czy ta myśl (najlepiej) chroni moje życie i zdrowie?','Czy ta myśl (najlepiej) pomaga mi osiągać moje bliższe i dalsze cele?','Czy ta myśl (najlepiej) pomaga mi unikać najbardziej niepożądanych konfliktów lub sobie z nimi radzić?','Czy ta myśl pomaga mi czuć się tak, jak chcę, bez nadużywania żadnych substancji?'];
@@ -372,26 +367,6 @@ const PROBES=[
  {s:'Jakie ma znaczenie?',q:'A jakie to ma dla ciebie znaczenie?'},
  {s:'Co byłoby najgorsze?',q:'Gdyby to było prawdą, co by było w tym dla ciebie najgorsze?'}
 ];
-const mk=(stems,words)=>{const r=[];if(stems&&stems.length)r.push(new RegExp('(^|[^\\p{L}])('+stems.join('|')+')','iu'));if(words&&words.length)r.push(new RegExp('(^|[^\\p{L}])('+words.join('|')+')(?=$|[^\\p{L}])','iu'));return r};
-const DIST=[
- {id:'mind',n:'Czytanie w myślach',d:'Zakładasz, że wiesz, co myślą inni, choć tego nie sprawdzasz.',e:'„Na pewno uważa, że jestem nudna.”',re:mk(['pewnie (ma |myśl|uważ|sądz|nie lub|jest zł|się na mnie)','na pewno (myśl|uważ|sądz|ma mnie|mają mnie|się na mnie)','myśl(i|ą),? że','uważ(a|ają),? że','ma(ją)? mnie dość','nie lubi(ą)? mnie','ocenia(ją)? mnie','śmieją się ze mnie','widzą, że']),x:['Zapytaj wprost, co ta osoba myśli, zamiast zgadywać.','Zapisz, jak według Ciebie ktoś zareaguje, i porównaj z tym, co się stało.']},
- {id:'filter',n:'Filtr negatywny',d:'Widzisz tylko to, co poszło źle, a pomijasz resztę.',e:'„Prezentacja była fatalna, bo raz się pomyliłam.”',re:mk(['tylko (to|ten|ta|źle|błęd|minus)','jedyne,? co','same (błędy|porażki|minusy)','wszystko poszło źle','nic dobrego','zepsuł(a|o|em|am)? wszystko']),x:['Przez kilka dni zapisuj wieczorem 3 rzeczy, które poszły dobrze albo neutralnie.','Poproś kogoś o opinię: co wypadło dobrze?']},
- {id:'label',n:'Etykietkowanie',d:'Przyklejasz sobie albo komuś etykietę zamiast opisać konkretne zachowanie.',e:'„Jestem nieudacznikiem.”',re:mk(['(jestem|jesteś|jest|są) (do niczego|głup|beznadziejn|nieudaczn|idiot|leniw|słab|żałosn|bezużyteczn|egoist|nudn|niekompetentn|porażk|nienormaln|dziwn|beznadzie|nikim)','nieudaczni','mysz(ą)? bez']),x:['Przez tydzień zapisuj fakty, które nie pasują do tej etykiety.','Zapytaj 2–3 osoby, jak by Cię opisały.']},
- {id:'whatif',n:'Gdybanie',d:'Krążysz wokół „a co, jeśli…” i wyobrażasz sobie najgorsze scenariusze.',e:'„A co, jeśli zapomnę tekstu?”',re:mk(['a co,? jeśli','a co,? gdyby','co,? jeśli','co,? gdyby','a jeśli','a gdyby']),x:['Zapisz swoje „a co, jeśli…” i po fakcie sprawdź, czy to się wydarzyło.','Wejdź w sytuację bez dodatkowych zabezpieczeń i zobacz, co się stanie.']},
- {id:'overgen',n:'Nadmierne uogólnianie',d:'Z jednego zdarzenia robisz regułę na zawsze.',e:'„Nigdy mi nic nie wychodzi.”',re:mk(['jak zwykle'],['zawsze','nigdy','wszyscy','wszystko','nikt','nic','każdy','ciągle','znowu','wiecznie']),x:['Policz, ile razy w tym tygodniu to się naprawdę zdarzyło, jak w Teście Kamery.','Poszukaj jednego wyjątku od reguły „zawsze” albo „nigdy”.']},
- {id:'dicho',n:'Myślenie dychotomiczne',d:'Widzisz tylko dwie skrajności, np. idealnie albo porażka.',e:'„Jeśli nie dostanę piątki, to porażka.”',re:mk(['idealn','perfekc','całkowic','kompletn','totaln','zupełn','porażk'],['albo']),x:['Oceń wynik na skali 0–100 zamiast „sukces albo porażka”.','Celowo zrób coś na 80%, a nie na 100%, i sprawdź skutki.']},
- {id:'catast',n:'Katastrofizacja',d:'Uznajesz, że coś jest okropne albo nie do zniesienia.',e:'„To będzie koszmar, nie przeżyję tego.”',re:mk(['okropn','straszn','koszmar','katastrof','tragedi','tragiczn','masakr','fataln','nie do zniesienia','nie do wytrzymania','nie zniosę','nie wytrzymam','nie przeżyję','koniec świata']),x:['Zapisz, jak źle będzie (0–10), a potem oceń, jak źle było naprawdę.','Zrób mały krok w stronę tej sytuacji i obserwuj, co się dzieje.']},
- {id:'must',n:'Nadużywanie imperatywów',d:'Stawiasz sobie albo innym sztywne „muszę”, „powinnam/powinienem”, „nie wolno”.',e:'„Muszę zawsze być na czas.”',re:mk(['musz','musi','powin','trzeba','nie wolno','nie mogę sobie pozwolić','należy']),x:['Celowo zrób coś „wystarczająco dobrze”, a nie idealnie.','Raz odpuść jedno „muszę” i zobacz, co się stanie.']},
- {id:'comp',n:'Niesprawiedliwe porównania',d:'Porównujesz się z innymi tak, że zawsze wypadasz gorzej.',e:'„Inni piszą szybciej ode mnie.”',re:mk(['lepsz','gorsz','niż ja','ode mnie','od mnie','inni (potrafią|mają|umieją|są|dają)','wszyscy (potrafią|mają|umieją|dają)']),x:['Zapytaj osobę, z którą się porównujesz, z czym ona ma trudność.','Porównaj się z sobą sprzed roku, a nie z innymi.']},
- {id:'pers',n:'Personalizacja',d:'Bierzesz na siebie winę za coś, na co masz mały wpływ, albo odnosisz cudze zachowanie do siebie.',e:'„Jest smutny, to na pewno przeze mnie.”',re:mk(['przeze mnie','moja wina','z mojego powodu','chodzi o mnie','to ja (zawini|zepsu)']),x:['Wypisz inne możliwe przyczyny sytuacji i sprawdź jedną z nich.','Zapytaj tę osobę, co się stało.']},
- {id:'fortune',n:'Przepowiadanie przyszłości',d:'Przewidujesz zły wynik, jakby był pewny.',e:'„Na pewno nie zdam.”',re:mk(['(na pewno|i tak|pewnie) (nie|się nie|mi się nie)','nie (zdam|dam rady|poradzę|uda mi|wyjdzie|skończę|zdążę)','się nie uda','zawalę','zawiodę','skończy się','będzie (źle|okropnie|tragicznie|koszmar)','zostanę sam']),x:['Zapisz prognozę z datą i sprawdź ją po fakcie.','Zrób to, czego unikasz, i porównaj wynik z prognozą.']},
- {id:'discount',n:'Umniejszanie pozytywów',d:'Uznajesz, że dobre rzeczy się nie liczą albo są tylko przypadkiem.',e:'„Zdałam, ale to tylko szczęście.”',re:mk(['nie liczy','tylko szczęście','miał(am|em) szczęście','przypadek','każdy by','to nic takiego','byle co','ale to nic','nie ma się czym chwalić','zwykły fart']),x:['Zapisuj sukcesy bez dopisku „ale”.','Przyjmij komplement samym „dziękuję” i obserwuj reakcję.']},
- {id:'emo',n:'Uzasadnienie emocjonalne',d:'Traktujesz uczucie jako dowód: „czuję to, więc to prawda”.',e:'„Czuję się głupio, więc jestem głupia.”',re:mk(['czuję,? że','czuję się,? (jakby|że)','skoro czuję','czuję,? więc']),x:['Zapisz, co czujesz, i osobno sprawdź fakty Testem Kamery.','Zrób to mimo uczucia i zobacz, co się wydarzy.']}
-];
-const DMAP=Object.fromEntries(DIST.map(d=>[d.id,d]));
-const suggest=t=>t&&t.trim()?DIST.filter(d=>d.re.some(r=>r.test(t))).map(d=>d.id):[];
-const TYPES=[{v:'do',n:'Zrób inaczej i sprawdź',d:'Robisz coś po nowemu, np. swoje ZD, i patrzysz, co się stanie.'},{v:'ask',n:'Zapytaj innych',d:'Pytasz kilka osób, co myślą albo jak by zareagowały.'},{v:'obs',n:'Obserwuj',d:'Patrzysz, jak robią to inni i co się wtedy dzieje.'}];
-const TNAME=Object.fromEntries(TYPES.map(t=>[t.v,t.n]));
 const OUT={yes:['Sprawdziło się','pill'],partly:['Częściowo','pill ex'],no:['Nie sprawdziło się','pill goal']};
 
 const STEPS=[
@@ -399,15 +374,12 @@ const STEPS=[
  {k:'C',L:'C',n:'2',side:'now',r:'Emocje',t:'Jakie emocje się pojawiły?',h:'Nazwij emocje i oceń ich natężenie od 1 do 10. Jeśli nie budzi to zbyt dużego niepokoju, zauważ też, co działo się w ciele.'},
  {k:'D',L:'D',n:'3',side:'now',r:'Zachowanie',t:'Co zrobiłam / zrobiłem?',h:'Co zrobiłeś/zrobiłaś w tej sytuacji? To może być działanie widoczne z zewnątrz albo „wewnętrzne”, np. rozmyślanie albo zaniechanie czegoś.'},
  {k:'B',L:'B',n:'4',side:'now',r:'Myśli',t:'Jakie myśli się pojawiły?',h:'Wypisz wszystkie myśli, obrazy i wspomnienia, każdą osobno. Zapisuj je bez cenzurowania i bez poprawiania. Skończ, gdy masz wrażenie, że to już wszystko. Przy ważnej myśli użyj strzałki w dół, żeby dotrzeć do głębszego przekonania.'},
- {k:'dist',L:'B',n:'',side:'now',r:'Zniekształcenia',t:'Jakie zniekształcenia widzisz?',h:'Zaznacz zniekształcenia w swoich myślach. Jedna myśl może mieć kilka. Propozycje oznaczone kropką aplikacja znalazła po słowach w myśli. Ten krok możesz pominąć.'},
  {k:'plus',L:'+',n:'5',side:'bal',sep:'Bilans 1',r:'Plusy reakcji',t:'Co dobrego daje mi ta reakcja?',h:'Dzięki temu, że tak reaguję… co dobrego się dzieje? Czego niedobrego unikam? Jeśli nic nie przychodzi do głowy, zapytaj siebie: czy odkąd tak reaguję, coś w moim życiu zmieniło się na lepsze?'},
  {k:'minus',L:'−',n:'6',side:'bal',r:'Koszty reakcji',t:'Ile mnie to kosztuje?',h:'Co tracę przez tę reakcję? Co niekorzystnego się dzieje?'},
- {k:'dec1',L:'?',n:'',side:'bal',r:'Decyzja',t:'Czy chcesz pracować nad zmianą?',h:'Przeczytaj lewą stronę. Nie spiesz się z pracą nad zmianą. Jeśli nie masz pewności, czy chcesz reagować inaczej, prawdopodobnie są przekonania, zgodnie z którymi ta reakcja jest Ci potrzebna. Czy widzisz je w B?'},
  {k:'ZC',L:'ZC',n:'7',side:'goal',sep:'Jak chcę',r:'Emocje docelowe',t:'Jak chcę się czuć?',h:'Jakie emocje chcesz czuć w takiej sytuacji i jak mocno? Mogą to być emocje neutralne, słabsze albo inne niż dotąd. Napisz, czego chcesz, a nie czego nie chcesz.'},
  {k:'ZD',L:'ZD',n:'8',side:'goal',r:'Zachowanie docelowe',t:'Co chcę zrobić?',h:'Jak chcesz się zachować w takiej sytuacji? Czasem ZD jest takie samo jak D, tylko w innym stanie emocjonalnym. Napisz, czego chcesz, a nie czego nie chcesz. Jeśli jeszcze nie wiesz, zostaw puste.'},
  {k:'cost',L:'−',n:'9',side:'bal',sep:'Bilans 2',r:'Koszty zmiany',t:'Co mogę stracić, zmieniając reakcję?',h:'Wyobraź sobie siebie w sytuacji A z nowymi reakcjami ZC i ZD. Jak się z nimi czujesz? Co dzieje się później? Pozwól myślom spontanicznie się pojawić. Co możesz stracić? Co niedobrego może się stać?'},
  {k:'gain',L:'+',n:'10',side:'bal',r:'Zyski ze zmiany',t:'Co zyskam dzięki zmianie?',h:'Co dobrego się wydarzy dzięki nowej reakcji? Te odpowiedzi pomogą Ci później pisać zdrowe myśli (ZB).'},
- {k:'dec2',L:'?',n:'',side:'bal',r:'Decyzja',t:'Czy chcesz iść dalej?',h:'Znowu moment na decyzję. Przejdź dalej, gdy czujesz, że naprawdę chcesz zmiany, a nie dlatego, że „powinieneś/powinnaś”. Jeśli na razie zostajesz przy starych reakcjach, staraj się, żeby były świadome: wracaj do swoich notatek.'},
  {k:'ZA',L:'ZA',n:'11',side:'goal',sep:'Praca z myślami',r:'Test Kamery',t:'Test Kamery',h:'Jak to zdarzenie nagrałaby kamera? Opisz tylko fakty: kto co powiedział i zrobił. Twoje emocje, myśli i odczucia w ciele przechodzą test, choć kamera ich nie nagra. Domysły o tym, co myślą inni, nie przechodzą.'},
  {k:'Q',L:'5?',n:'',side:'check',r:'Pięć pytań',t:'Pięć Pytań Zdrowego Myślenia',h:'Zadaj te pytania osobno każdej myśli z B. Zdrowe myślenie spełnia co najmniej 3 z 5 zasad. Pytania działają na twierdzenia: jeśli myśl jest pytaniem albo obrazem, zapisz najpierw, w co wierzysz.'},
  {k:'ZB',L:'ZB',n:'12',side:'goal',r:'Zdrowe myśli',t:'Jakie myśli będą dla mnie pomocne?',h:'Co innego chcesz myśleć? Jakie przekonanie byłoby dla Ciebie zdrowsze? Nowa myśl ma nie tylko dobrze brzmieć: ważne, żeby chcieć ją przyjąć i działać na jej podstawie. Sprawdź ją Pięcioma Pytaniami.'},
@@ -417,14 +389,12 @@ const SIDX=Object.fromEntries(STEPS.map((s,i)=>[s.k,i]));
 
 const XPLAN=[
  {k:'thought',t:'Którą myśl sprawdzisz?',h:'Wybierz myśl B z analizy albo wpisz inną. Oceń, na ile w nią teraz wierzysz.'},
- {k:'type',t:'Jak ją sprawdzisz?',h:'Wybierz rodzaj eksperymentu. Pomysły poniżej pasują do zniekształceń w tej myśli. Stuknij pomysł, żeby dodać go do planu.'},
- {k:'pred',t:'Co według Ciebie się stanie?',h:'Zapisz przewidywanie tak konkretnie, żeby dało się je sprawdzić. Np. „Jeśli zadam pytanie, ktoś się zaśmieje”.'},
- {k:'plan',t:'Twój plan',h:'Mały krok wystarczy. Nie zaczynaj od najtrudniejszej sytuacji.'}
+ {k:'pred',t:'Co by się stało, gdyby to była prawda?',h:'Eksperyment sprawdza konkretne przewidywanie, a nie ogólną myśl. Zamień myśl na przewidywanie, które da się sprawdzić w prawdziwym życiu.'},
+ {k:'plan',t:'Twój plan',h:'Co dokładnie zrobisz i kiedy? Mały krok wystarczy. Nie zaczynaj od najtrudniejszej sytuacji.'}
 ];
 const XRES=[
  {k:'res',t:'Co się wydarzyło?',h:'Opisz tylko fakty, jak w Teście Kamery: kto co powiedział i zrobił. Bez ocen i domysłów.'},
- {k:'concl',t:'Jaki jest wniosek?',h:'Porównaj to, co się wydarzyło, ze swoim przewidywaniem.'},
- {k:'bel',t:'Na ile teraz w to wierzysz?',h:'Oceń obie myśli jeszcze raz. Zmiana nie musi być duża. Liczy się kierunek.'}
+ {k:'concl',t:'Jaki jest wniosek?',h:'Porównaj to, co się wydarzyło, ze swoim przewidywaniem. Potem oceń myśl jeszcze raz.'}
 ];
 
 /* ---------- pomocnicze ---------- */
@@ -481,10 +451,11 @@ function load(){
  try{const s=JSON.parse(localStorage.getItem(KEY)||'null');
   if(s&&Array.isArray(s.entries)){
    S.entries=s.entries.map(migrate);S.exps=Array.isArray(s.exps)?s.exps:[];
-   if(!s.v||s.v<VER){if(S.entries.some(e=>e.example)){S.entries=S.entries.filter(e=>!e.example).concat(samples());S.exps=S.exps.filter(x=>!x.example).concat(sampleExps())}S.step=0}
+   const old=!s.v||s.v<VER;
+   if(old){if(S.entries.some(e=>e.example)||S.exps.some(x=>x.example)){S.entries=S.entries.filter(e=>!e.example).concat(samples());S.exps=S.exps.filter(x=>!x.example).concat(sampleExps())}S.step=0}
    else S.step=Math.min(STEPS.length-1,Math.max(0,s.step|0));
    S.draft=s.draft?migrate(s.draft):null;S.editing=s.editing||null;
-   S.xd=s.xd||null;S.xmode=s.xmode||'plan';S.xstep=s.xstep|0;
+   S.xd=old?null:(s.xd||null);S.xmode=s.xmode||'plan';S.xstep=old?0:(s.xstep|0);
    return}
  }catch(e){}
  S.entries=samples();S.exps=sampleExps();
@@ -556,15 +527,6 @@ function stepB(d){
  <ul><li>Co musiałem/musiałam myśleć, skoro tak zareagowałem/zareagowałam?</li><li>Co ta przestraszona (zła, smutna) część mnie chciałaby powiedzieć? W co wierzy? Czego się obawia?</li><li>Gdyby to odczucie w ciele mogło mówić, co by powiedziało?</li><li>Czego chce ta część mnie, która wybrała to zachowanie? Na czym jej zależy?</li><li>Co mogłaby myśleć inna osoba, która zareagowała tak jak ja?</li></ul>
  <span>Myśli mogą być też obrazami albo wspomnieniami. Je również zapisz.</span></div></details>`;
 }
-function stepDist(d){
- const bs=Bfull(d);if(!bs.length)return `<p class="empty">Najpierw zapisz myśli w kroku 4 (B).</p>`;
- return `<details class="more"><summary>Słowniczek zniekształceń</summary><div class="in"><dl class="glos" style="margin:0">${DIST.map(x=>`<dt>${x.n}</dt><dd>${x.d} ${x.e}</dd>`).join('')}</dl></div></details>
- ${bs.map(([b,i])=>{const sug=suggest(b.text);const all=!!ui.showAll[b.id];
-  const order=[...sug,...b.dist.filter(x=>!sug.includes(x)),...(all?DIST.map(x=>x.id).filter(x=>!sug.includes(x)&&!b.dist.includes(x)):[])];
-  return `<div class="thought${b.keyFrom?' key':''}"><div class="top"><span class="lbl">${bLabel(d,i)} ${keyInfo(d,b)}</span></div><p class="ttext">${h(b.text)}</p>
-  <div class="chips">${order.map(id=>`<button class="chip ${b.dist.includes(id)?'on':''} ${sug.includes(id)?'sug':''}" data-act="dist" data-i="${i}" data-v="${id}" aria-pressed="${b.dist.includes(id)}">${DMAP[id].n}</button>`).join('')}<button class="chip" data-act="distAll" data-id="${b.id}">${all?'Zwiń':'Pokaż wszystkie'}</button></div>
-  ${b.dist.length?`<div class="distdesc">${b.dist.map(id=>`<span><b>${DMAP[id].n}.</b> ${DMAP[id].d}</span>`).join('')}</div>`:''}</div>`}).join('')}`;
-}
 function stepQ(d){
  const bs=Bfull(d);if(!bs.length)return `<p class="empty">Najpierw zapisz myśli w kroku 4 (B).</p>`;
  return bs.map(([b,i])=>`<div class="thought${b.keyFrom?' key':''}"><div class="pairB"><b>${bLabel(d,i)}</b>${h(b.text)} ${keyInfo(d,b)}</div>
@@ -584,12 +546,6 @@ function stepZB(d){
  ${scoreHtml(z.q,true)}${z.accept===false?`<div class="note"><span>Nowa myśl ma nie tylko dobrze brzmieć. Poszukaj takiej, którą zechcesz przyjąć jako swoją i która odbierze moc myśli z lewej strony.</span></div>`:''}`:''}
  </div>`}).join('');
 }
-function stepDec(d,k){
- const lst=a=>{const f=a.filter(x=>x.trim());return f.length?`<ul>${f.map(x=>`<li>${h(x)}</li>`).join('')}</ul>`:'<span class="empty">—</span>'};
- const recap=k==='dec1'?`<div class="recap"><span class="k">Twoje myśli (B)</span>${Bfull(d).length?`<ul>${Bfull(d).map(([b])=>`<li>${h(b.text)}</li>`).join('')}</ul>`:'<span class="empty">—</span>'}<span class="k">Plusy reakcji</span>${lst(d.plus)}<span class="k">Koszty reakcji</span>${lst(d.minus)}</div>`
- :`<div class="recap"><span class="k">Koszty zmiany</span>${lst(d.cost)}<span class="k">Zyski ze zmiany</span>${lst(d.gain)}</div>`;
- return recap+`<div class="decide"><button class="btn primary big" data-act="decide" data-v="go">Chcę pracować nad zmianą</button><button class="btn big" data-act="go" data-i="${SIDX.B}">Wracam do myśli B, żeby poszukać</button><button class="btn ghost big" data-act="decide" data-v="stay">Na razie zostaję przy tym, co jest</button></div>`;
-}
 function stepBody(st){
  const d=S.draft;
  switch(st.k){
@@ -597,10 +553,8 @@ function stepBody(st){
   case 'C':return emoList('C.em')+ta('C.body','Jakie reakcje ciała im towarzyszą?','Odczucia w ciele, postawa, mimika…',2)+ta('C.impulse','Jakie impulsy do działania się pojawiły?','Np. miałam ochotę uciec, krzyczeć, zapaść się pod ziemię…',2,'opcjonalnie')+`<div id="hint">${hintFeel()}</div>`;
   case 'D':return ta('D','Co rzeczywiście zrobiłam / zrobiłem?','Opisz swoje zachowanie…',4);
   case 'B':return stepB(d);
-  case 'dist':return stepDist(d);
   case 'plus':return strList('plus','Pozytywne konsekwencje C i D','+','Dzięki temu…')+quickB('Czy myśli o tych korzyściach zmotywowały Cię do takiej reakcji? Jeśli tak, dopisz je do B.');
-  case 'minus':return strList('minus','Negatywne konsekwencje C i D','−','Przez to…');
-  case 'dec1':case 'dec2':return stepDec(d,st.k);
+  case 'minus':return strList('minus','Negatywne konsekwencje C i D','−','Przez to…')+`<div class="recap"><span class="k">Lewa strona gotowa</span><span>Czy chcesz teraz pracować nad zmianą? Nie spiesz się. Jeśli nie masz pewności, prawdopodobnie są przekonania, zgodnie z którymi ta reakcja jest Ci potrzebna. Warto ich poszukać w B.</span><span>Jeśli chcesz iść dalej, stuknij „Idę dalej”. Jeśli na razie zostajesz przy tym, co jest:</span><button class="btn add" data-act="saveLeft">Na razie zapisuję lewą stronę</button></div>`;
   case 'ZC':return emoList('ZC.em')+ta('ZC.body','Jakie reakcje ciała towarzyszą tym emocjom?','Wyobraź je sobie, „poczuj”, przyjmij taką postawę…',2)+`<div id="hint">${hintWant('ZC')}</div>`;
   case 'ZD':return ta('ZD','Co chcę zrobić w takiej sytuacji?','Opisz zachowanie, które chcesz wybrać…',4)+`<div class="note"><span><b>Racjonalny wybór:</b> możesz spokojnie zaakceptować sytuację, poprawić ją albo się z niej wydostać.</span></div><div id="hint">${hintWant('ZD')}</div>`;
   case 'cost':return strList('cost','Przewidywane koszty zmiany','−','Jeśli zareaguję inaczej, to…')+quickB('Czy któraś z tych myśli sprawia, że wybierasz starą reakcję? Jeśli tak, dopisz ją do B.');
@@ -620,7 +574,7 @@ function summary(d){
  const zbs=bl.filter(([b])=>b.zb.text.trim());
  return `<div class="sumgrid${left?' one':''}"><div class="sumcol now"><h3>Jak jest</h3>
  <div class="sumcell"><div class="k">1 · A · Sytuacja</div>${para(d.A)}</div>
- <div class="sumcell"><div class="k">4 · B · Myśli</div>${bl.length?bl.map(([b,i])=>`<p><b>B${i+1}.</b> ${h(b.text)} ${b.keyFrom?'<span class="pill">kluczowe</span>':''} ${b.dist.map(x=>`<span class="pill mute">${DMAP[x]?DMAP[x].n:''}</span>`).join(' ')}</p>${b.arrow.filter(l=>l.text.trim()).map(l=>`<p class="chain">↓ ${h(l.text)}</p>`).join('')}`).join(''):'<p class="empty">—</p>'}</div>
+ <div class="sumcell"><div class="k">4 · B · Myśli</div>${bl.length?bl.map(([b,i])=>`<p><b>B${i+1}.</b> ${h(b.text)} ${b.keyFrom?'<span class="pill">kluczowe</span>':''}</p>${b.arrow.filter(l=>l.text.trim()).map(l=>`<p class="chain">↓ ${h(l.text)}</p>`).join('')}`).join(''):'<p class="empty">—</p>'}</div>
  <div class="sumcell"><div class="k">2 · C · Emocje i ciało</div>${emoTxt(d.C.em)?`<p>${emoTxt(d.C.em)}</p>`:''}${para(d.C.body)}</div>
  <div class="sumcell"><div class="k">3 · D · Zachowanie</div>${para(d.D)}</div>
  </div>${left?'':`<div class="sumcol goal"><h3>Jak chcę</h3>
@@ -636,17 +590,17 @@ function summary(d){
 /* ---------- widok: analiza ---------- */
 function renderNew(){
  draft();const st=STEPS[S.step];
- const rail=STEPS.map((s,i)=>(s.sep?`<div class="sep">${s.sep}</div>`:'')+`<button class="s-${s.side}" data-act="go" data-i="${i}" ${i===S.step?'aria-current="step"':''}><span class="num">${s.n||(s.k.startsWith('dec')?'?':s.k==='Q'?'✓':'·')}</span><span>${s.r}</span></button>`).join('');
+ const rail=STEPS.map((s,i)=>(s.sep?`<div class="sep">${s.sep}</div>`:'')+`<button class="s-${s.side}" data-act="go" data-i="${i}" ${i===S.step?'aria-current="step"':''}><span class="num">${s.n||(s.k==='Q'?'✓':'·')}</span><span>${s.r}</span></button>`).join('');
  const pct=Math.round(S.step/(STEPS.length-1)*100);
- const mprog=`<div class="mprog"><div class="mtop"><span><b>${S.step+1} / ${STEPS.length}</b> · ${st.r}</span><button class="btn small" data-act="toggleRail" aria-expanded="${ui.railOpen}">${ui.railOpen?'Zamknij listę':'Wszystkie kroki'}</button></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>`;
- const eb=st.n?'Krok '+st.n+' z 12':st.k==='dist'?'Krok dodatkowy · nieobowiązkowy':st.k.startsWith('dec')?'Moment decyzji':st.k==='Q'?'Sprawdzenie myśli':'Gotowe';
- const isDec=st.k.startsWith('dec');const last=S.step===STEPS.length-1;
- const nextLbl=st.k==='dist'&&!S.draft.B.some(b=>b.dist.length)?'Pomiń →':'Dalej →';
+ const mprog=`<div class="mprog"><div class="mtop"><span><b>${st.n?st.n:st.k==='Q'?'11':'12'} / 12</b> · ${st.r}</span><button class="btn small" data-act="toggleRail" aria-expanded="${ui.railOpen}">${ui.railOpen?'Zamknij listę':'Wszystkie kroki'}</button></div><div class="pbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>`;
+ const eb=st.n?'Krok '+st.n+' z 12':st.k==='Q'?'Sprawdzenie myśli':'Gotowe';
+ const last=S.step===STEPS.length-1;
+ const nextLbl=st.k==='minus'?'Idę dalej →':'Dalej →';
  return `<div class="wizard">${mprog}<aside class="rail${ui.railOpen?' open':''}" aria-label="Kroki">${rail}</aside>
  <section class="card side-${st.side}"><div class="stephead"><div class="letter" aria-hidden="true">${st.L}</div><div class="eyebrow">${eb}${S.editing?' · edycja wpisu':''}</div><h2>${st.t}</h2></div>
  <p class="help">${st.h}</p><div class="fields">${stepBody(st)}</div>
  <div class="stepnav">${S.step>0?'<button class="btn" data-act="prev">← Wstecz</button>':''}
- ${isDec?'':last?'<button class="btn primary" data-act="saveEntry">Zapisz</button>':`<button class="btn primary" data-act="next">${nextLbl}</button>`}</div>
+ ${last?'<button class="btn primary" data-act="saveEntry">Zapisz</button>':`<button class="btn primary" data-act="next">${nextLbl}</button>`}</div>
  <div class="discard"><button class="btn ghost small" data-act="discard">Wyczyść formularz</button></div></section></div>
  <datalist id="emolist">${['lęk','złość','smutek','wstyd','poczucie winy','zazdrość','rozczarowanie','irytacja','niepokój','spokój','ciekawość','radość','żal','ulga','trema'].map(t=>`<option value="${t}">`).join('')}</datalist>`;
 }
@@ -675,37 +629,24 @@ function candThoughts(entryId){
 const xsl=(path,label,val,min,max,suf,cls='')=>`<label class="f">${label}<span class="slider"><input type="range" class="${cls}" id="x-${path}" min="${min}" max="${max}" data-xpath="${path}" data-suf="${suf}" value="${val}"><output>${val}${suf}</output></span></label>`;
 const xta=(path,label,ph,rows=3,sub='')=>`<label class="f">${label}${sub?` <small>${sub}</small>`:''}<textarea id="x-${path}" data-xpath="${path}" rows="${rows}" placeholder="${h(ph)}">${h(S.xd[path])}</textarea></label>`;
 function xBody(k){
- const x=S.xd;const [e,b]=findB(x.entryId,x.bId);
+ const x=S.xd;
  switch(k){
   case 'thought':{const c=candThoughts(x.entryId&&!x.free?x.entryId:null);
    return (c.length?`<div class="stack"><div class="eyebrow">Myśli z Twoich analiz</div><div class="tcards">${c.map(o=>`<button class="tcard" data-act="xpick" data-e="${o.e.id}" data-b="${o.b.id}" aria-pressed="${x.bId===o.b.id}"><span>${h(o.b.text)}</span><span class="src">${h(o.e.title||'Bez nazwy')} · ${fmtS(o.e.date)}${o.b.keyFrom?' · przekonanie kluczowe':''}</span></button>`).join('')}</div>${x.entryId&&!x.free?`<button class="btn small ghost add" data-act="xfree">Pokaż myśli ze wszystkich analiz</button>`:''}</div>`:'')+
-   xta('bText',c.length?'Albo wpisz inną myśl':'Myśl do sprawdzenia','Np. Jeśli powiem, co myślę, wszyscy się na mnie obrażą.',2)+
-   xsl('belB','Na ile w nią teraz wierzysz?',x.belB,0,100,'%')+
-   xta('zbText','Zdrowa myśl (ZB), która może ją zastąpić','Np. Mogę powiedzieć, co myślę. Ludzie zwykle przyjmują to spokojnie.',2,'opcjonalnie')+
-   (x.zbText.trim()?xsl('belZB','Na ile wierzysz w ZB?',x.belZB,0,100,'%','rg-goal'):'');}
-  case 'type':{let ids=b&&b.dist.length?b.dist:suggest(x.bText);
-   const ideas=ids.map(id=>DMAP[id]).filter(Boolean);
-   const zd=e&&e.ZD&&e.ZD.trim()?e.ZD.trim():'';
-   return `<div class="tcards">${TYPES.map(t=>`<button class="tcard" data-act="xtype" data-v="${t.v}" aria-pressed="${x.type===t.v}"><b>${t.n}</b><small>${t.d}</small></button>`).join('')}</div>
-   <div class="stack"><div class="eyebrow">Pomysły na eksperyment</div>
-   ${zd?`<div class="stack" style="gap:6px"><span class="score" style="margin:0">Twoje ZD z analizy</span><div class="chips"><button class="chip g" data-act="xidea" data-v="${h(zd)}">${h(zd)}</button></div></div>`:''}
-   ${ideas.length?ideas.map(dd=>`<div class="stack" style="gap:6px"><span class="score" style="margin:0">${dd.n}</span><div class="chips">${dd.x.map(t=>`<button class="chip g" data-act="xidea" data-v="${h(t)}">${h(t)}</button>`).join('')}</div></div>`).join(''):`<div class="chips">${['Zrób to, czego zwykle unikasz, i zapisz, co się wydarzyło.','Zapytaj 2–3 osoby, co myślą o takiej sytuacji.','Zapisz prognozę i sprawdź ją po fakcie.'].map(t=>`<button class="chip g" data-act="xidea" data-v="${h(t)}">${h(t)}</button>`).join('')}</div>`}
-   ${x.plan.trim()?`<div class="pairB o"><b>Plan</b>${h(x.plan)}</div>`:''}</div>`;}
-  case 'pred':{const costs=e?e.cost.filter(c=>c.trim()):[];
-   return (costs.length?`<div class="stack" style="gap:6px"><div class="eyebrow">Twoje koszty zmiany z kroku 9</div><div class="chips">${costs.map(c=>`<button class="chip" data-act="xpred" data-v="${h(c)}">${h(c)}</button>`).join('')}</div></div>`:'')+
-   `<div class="pairB"><b>B</b>${h(x.bText)}</div>`+xta('prediction','Moje przewidywanie','Jeśli zrobię…, to…',3)+
-   xsl('predConf','Na ile jesteś pewna/pewny, że tak się stanie?',x.predConf,0,100,'%');}
-  case 'plan':return xta('plan','Co dokładnie zrobisz?','Np. Na jutrzejszym seminarium zadam jedno pytanie.',3)+
+   xta('bText',c.length?'Albo wpisz inną myśl':'Myśl do sprawdzenia','Np. Jestem do niczego.',2)+
+   xsl('belB','Na ile w nią teraz wierzysz?',x.belB,0,100,'%');}
+  case 'pred':return `<div class="pairB"><b>B</b>${h(x.bText)}</div>
+   <div class="note"><span><b>Przykład</b></span><span>Myśl: <i>Jestem do niczego.</i></span><span>Przewidywanie: <i>Jeśli to prawda, to gdy oddam rozdział, promotor uzna go za bezwartościowy.</i></span></div>`+
+   xta('prediction','Gdyby ta myśl była prawdziwa, co by się stało, gdy…?','Jeśli to prawda, to gdy…, wtedy…',3);
+  case 'plan':return `<div class="pairB"><b>Przewidywanie</b>${h(x.prediction)}</div>`+xta('plan','Co dokładnie zrobisz, żeby to sprawdzić?','Np. Oddam rozdział w piątek i przeczytam, co dokładnie napisze promotor.',3)+
    `<div class="row2"><label class="f">Kiedy?<input type="date" id="x-date" data-xpath="date" value="${h(x.date)}"></label><label class="f">O której?<input type="time" id="x-time" data-xpath="time" value="${h(x.time)}"></label></div>`+
    xsl('diff','Trudność (1 = łatwo, 10 = bardzo trudno)',x.diff,1,10,'')+
-   xta('safety','Z jakich „zabezpieczeń” zrezygnujesz?','Np. nie przygotuję pytania na kartce, nie będę mówić bardzo cicho.',2,'rzeczy, które robisz „na wszelki wypadek”; fałszują wynik')+
-   xta('obstacles','Co może przeszkodzić i co wtedy zrobisz?','Np. Jeśli zabraknie czasu, zapytam po zajęciach.',2,'opcjonalnie')+
-   `<div class="note"><span><b>Bezpieczeństwo.</b> Eksperyment nie może zagrażać Twojemu zdrowiu ani poważnie szkodzić relacjom (pytania 2 i 4 z Pięciu Pytań). Jeśli masz wątpliwości, wybierz mniejszy krok albo omów go z terapeutą.</span></div>`;
-  case 'res':return `<div class="pairB o"><b>Plan</b>${h(x.plan)}</div><div class="pairB"><b>Przewidywanie</b>${h(x.prediction)} <span class="pill">${x.predConf}% pewności</span></div>`+xta('result','Co się wydarzyło?','Kto co powiedział i zrobił…',5);
+   `<p class="score">Eksperyment nie może zagrażać Twojemu zdrowiu ani poważnie szkodzić relacjom. Jeśli masz wątpliwości, wybierz mniejszy krok.</p>`;
+  case 'res':return `<div class="pairB o"><b>Plan</b>${h(x.plan)}</div><div class="pairB"><b>Przewidywanie</b>${h(x.prediction)}</div>`+xta('result','Co się wydarzyło?','Kto co powiedział i zrobił…',5);
   case 'concl':return `<div class="pairB"><b>Przewidywanie</b>${h(x.prediction)}</div><div class="stack"><div class="eyebrow">Czy przewidywanie się sprawdziło?</div><div class="seg" role="group" style="align-self:flex-start"><button class="yes" data-act="xout" data-v="no" aria-pressed="${x.outcome==='no'}">Nie</button><button class="mid" data-act="xout" data-v="partly" aria-pressed="${x.outcome==='partly'}">Częściowo</button><button class="no" data-act="xout" data-v="yes" aria-pressed="${x.outcome==='yes'}">Tak</button></div></div>`+
+   (x.outcome==='yes'?`<div class="note"><span>Przewidywanie się sprawdziło. To też cenna informacja. Zastanów się, czy było to tak złe, jak się wydawało, i jak sobie z tym poradziłeś/poradziłaś.</span></div>`:'')+
    xta('learned','Czego się dowiadujesz?','Co to mówi o myśli B? Co było inaczej, niż się spodziewałeś/spodziewałaś?',3)+
-   (x.outcome==='yes'?`<div class="note"><span>Przewidywanie się sprawdziło. To też cenna informacja. Zastanów się, jak sobie z tym poradziłeś/poradziłaś i czy to było tak złe, jak się wydawało.</span></div>`:'');
-  case 'bel':return `<div class="pairB"><b>B</b>${h(x.bText)}</div>`+xsl('belBAfter',`Na ile wierzysz w B? <small>przed: ${x.belB}%</small>`,x.belBAfter,0,100,'%')+(x.zbText.trim()?`<div class="pairB g"><b>ZB</b>${h(x.zbText)}</div>`+xsl('belZBAfter',`Na ile wierzysz w ZB? <small>przed: ${x.belZB}%</small>`,x.belZBAfter,0,100,'%','rg-goal'):'');
+   `<div class="pairB"><b>B</b>${h(x.bText)}</div>`+xsl('belBAfter',`Na ile teraz w nią wierzysz? <small>przed: ${x.belB}%</small>`,x.belBAfter,0,100,'%');
  }
 }
 function renderXWizard(){
@@ -736,13 +677,13 @@ function renderExp(){
  return `<div class="xwrap"><div class="toolbar"><h2>Eksperymenty</h2><button class="btn primary" data-act="xnew">+ Nowy eksperyment</button></div>
  ${!S.exps.length?intro:''}
  ${planned.length?`<div class="sect">Zaplanowane</div><div class="stack">${planned.map(x=>`<div class="xcard" id="xc-${x.id}"><div class="meta"><span>${fmt(x.date)}, ${h(x.time||'')}</span><span class="pill ex">trudność ${x.diff}/10</span>${x.example?'<span class="pill ex">przykład</span>':''}</div>
- <div class="quote">„${h(x.bText)}”</div><p><span class="k">Plan</span><br>${h(x.plan)}</p><p><span class="k">Przewidywanie</span><br>${h(x.prediction)} <span class="pill">${x.predConf}%</span></p>
+ <div class="quote">„${h(x.bText)}”</div><p><span class="k">Plan</span><br>${h(x.plan)}</p><p><span class="k">Przewidywanie</span><br>${h(x.prediction)}</p>
  <div class="tools"><button class="btn small primary" data-act="xres" data-id="${x.id}">Zapisz wynik</button><button class="btn small" data-act="xics" data-id="${x.id}">Do kalendarza</button><a class="btn small" href="${h(gcalUrl(x))}" target="_blank" rel="noopener">Kalendarz Google</a><button class="linkbtn" data-act="xdel" data-id="${x.id}">Usuń</button></div></div>`).join('')}</div>`:''}
- ${garr.length?`<div class="sect">Drabinki przekonań</div><div class="stack">${garr.map(g=>{const f=g[0],l=g[g.length-1];const last=l;return `<div class="xcard"><div class="quote">„${h(f.bText)}”</div>
- <div class="change">Wiara w B: <b>${f.belB}% → ${l.belBAfter??l.belB}%</b>${f.zbText.trim()?` · w ZB: <b>${f.belZB}% → ${l.belZBAfter??l.belZB}%</b>`:''}</div>
+ ${garr.length?`<div class="sect">Drabinki przekonań</div><div class="stack">${garr.map(g=>{const f=g[0],l=g[g.length-1];return `<div class="xcard"><div class="quote">„${h(f.bText)}”</div>
+ <div class="change">Wiara w myśl: <b>${f.belB}% → ${l.belBAfter??l.belB}%</b></div>
  <div class="ladder">${[...g].sort((a,b)=>a.diff-b.diff||(a.date).localeCompare(b.date)).map(x=>`<div class="rung"><span class="deg" title="trudność">${x.diff}</span><details><summary><span>${h(x.plan)}</span><span class="meta" style="display:flex;gap:6px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)"><span>${fmtS(x.doneDate||x.date)}</span>${x.outcome?`<span class="${OUT[x.outcome][1]}">${OUT[x.outcome][0]}</span>`:''}${x.example?'<span class="pill ex">przykład</span>':''}</span></summary>
- <div class="body"><p><span class="k">Rodzaj</span> ${TNAME[x.type]||''}</p><p><span class="k">Przewidywanie</span><br>${h(x.prediction)} (${x.predConf}% pewności)</p>${x.safety.trim()?`<p><span class="k">Bez zabezpieczeń</span><br>${h(x.safety)}</p>`:''}<p><span class="k">Co się wydarzyło</span><br>${h(x.result)||'—'}</p><p><span class="k">Wniosek</span><br>${h(x.learned)||'—'}</p><p class="change">B: <b>${x.belB}% → ${x.belBAfter??'—'}%</b>${x.zbText.trim()?` · ZB: <b>${x.belZB}% → ${x.belZBAfter??'—'}%</b>`:''}</p><div class="tools"><button class="linkbtn" data-act="xdel" data-id="${x.id}">Usuń</button></div></div></details></div>`).join('')}</div>
- <div class="tools"><button class="btn small" data-act="xrung" data-id="${last.id}">+ Kolejny szczebel</button></div></div>`}).join('')}</div>`:''}
+ <div class="body"><p><span class="k">Przewidywanie</span><br>${h(x.prediction)}</p><p><span class="k">Co się wydarzyło</span><br>${h(x.result)||'—'}</p><p><span class="k">Wniosek</span><br>${h(x.learned)||'—'}</p><p class="change">Wiara w myśl: <b>${x.belB}% → ${x.belBAfter??'—'}%</b></p><div class="tools"><button class="linkbtn" data-act="xdel" data-id="${x.id}">Usuń</button></div></div></details></div>`).join('')}</div>
+ <div class="tools"><button class="btn small" data-act="xrung" data-id="${l.id}">+ Kolejny szczebel</button></div></div>`}).join('')}</div>`:''}
  </div>`;
 }
 
@@ -760,25 +701,23 @@ function dumb(cls,lbl,a,b){const lo=Math.min(a,b),hi=Math.max(a,b);return `<div 
 function renderPat(){
  const E=[...S.entries].sort((a,b)=>a.date.localeCompare(b.date));
  if(!E.length&&!S.exps.length)return `<div class="card"><h3>Brak danych do analizy</h3><p class="help" style="margin-top:8px">Wzorce pojawią się po zapisaniu kilku analiz.</p><div style="height:12px"></div></div>`;
- const dc={},emos={},qn=[0,0,0,0,0],qa=[0,0,0,0,0],groups={};
- E.forEach(e=>{e.B.forEach(b=>{if(!b.text.trim())return;b.dist.forEach(id=>{dc[id]=(dc[id]||0)+1;(groups[id]=groups[id]||[]).push({text:b.text,date:e.date})});b.q.forEach((v,i)=>{if(v!==null){qa[i]++;if(v===false)qn[i]++}})});e.C.em.forEach(m=>{const n=m.name.trim().toLowerCase();if(n)emos[n]=(emos[n]||0)+1})});
- const dArr=Object.entries(dc).sort((a,b)=>b[1]-a[1]);const emoArr=Object.entries(emos).sort((a,b)=>b[1]-a[1]).slice(0,6);
+ const emos={},qn=[0,0,0,0,0],qa=[0,0,0,0,0];
+ E.forEach(e=>{e.B.forEach(b=>{if(!b.text.trim())return;b.q.forEach((v,i)=>{if(v!==null){qa[i]++;if(v===false)qn[i]++}})});e.C.em.forEach(m=>{const n=m.name.trim().toLowerCase();if(n)emos[n]=(emos[n]||0)+1})});
+ const emoArr=Object.entries(emos).sort((a,b)=>b[1]-a[1]).slice(0,6);
  const done=S.exps.filter(x=>x.status==='done');const checked=done.filter(x=>x.outcome);const came=checked.filter(x=>x.outcome==='yes').length;
- const dmax=dArr[0]?dArr[0][1]:1,emax=emoArr[0]?emoArr[0][1]:1;
+ const emax=emoArr[0]?emoArr[0][1]:1;
  const full=E.filter(e=>e.status!=='left');
  const ex=E.some(e=>e.example)||S.exps.some(x=>x.example);
  const bg={};done.forEach(x=>{const k=x.bText.trim().toLowerCase();(bg[k]=bg[k]||[]).push(x)});
  const bgs=Object.values(bg).map(g=>g.sort((a,b)=>(a.doneDate||a.date).localeCompare(b.doneDate||b.date)));
  return `<div class="toolbar"><h2>Wzorce w czasie</h2></div>
  ${ex?`<div class="banner"><span>Statystyki obejmują przykładowe dane.</span><button class="btn small" data-act="clearEx">Usuń przykłady</button></div>`:''}
- <div class="stats"><div class="stat"><div class="v">${E.length}</div><div class="l">zapisanych analiz</div></div><div class="stat"><div class="v">${done.length}</div><div class="l">zrobionych eksperymentów</div></div><div class="stat"><div class="v">${checked.length?came+' z '+checked.length:'—'}</div><div class="l">przewidywań się sprawdziło</div></div><div class="stat"><div class="v sm">${dArr[0]?DMAP[dArr[0][0]].n:'—'}</div><div class="l">najczęstsze zniekształcenie</div></div></div>
+ <div class="stats"><div class="stat"><div class="v">${E.length}</div><div class="l">zapisanych analiz</div></div><div class="stat"><div class="v">${done.length}</div><div class="l">zrobionych eksperymentów</div></div><div class="stat"><div class="v">${checked.length?came+' z '+checked.length:'—'}</div><div class="l">przewidywań się sprawdziło</div></div></div>
  <div class="pgrid">
- <div class="panel wide"><h3>Wiara w przekonania po eksperymentach</h3><p class="sub">Dla każdej sprawdzanej myśli: od pierwszego eksperymentu do ostatniego. Pełna kropka to stan teraz.</p>${bgs.length?bgs.map(g=>{const f=g[0],l=g[g.length-1];return `<div class="belgrp"><span class="quote">„${h(f.bText)}” <span class="pill mute">${g.length} ${g.length===1?'eksperyment':g.length<5?'eksperymenty':'eksperymentów'}</span></span>${dumb('b','B',f.belB,l.belBAfter??f.belB)}${f.zbText.trim()?dumb('z','ZB',f.belZB,l.belZBAfter??f.belZB):''}</div>`}).join(''):'<p class="empty">Pojawi się po pierwszym zakończonym eksperymencie.</p>'}</div>
+ <div class="panel wide"><h3>Wiara w myśli po eksperymentach</h3><p class="sub">Dla każdej sprawdzanej myśli: od pierwszego eksperymentu do ostatniego. Pełna kropka to stan teraz.</p>${bgs.length?bgs.map(g=>{const f=g[0],l=g[g.length-1];return `<div class="belgrp"><span class="quote">„${h(f.bText)}” <span class="pill mute">${g.length} ${g.length===1?'eksperyment':g.length<5?'eksperymenty':'eksperymentów'}</span></span>${dumb('b','B',f.belB,l.belBAfter??f.belB)}</div>`}).join(''):'<p class="empty">Pojawi się po pierwszym zakończonym eksperymencie.</p>'}</div>
  <div class="panel wide"><h3>Natężenie emocji: jak jest i jak chcę</h3><p class="sub">Najwyższe natężenie w każdej pełnej analizie. Gdy linie się zbliżają, różnica między reakcją a celem maleje.</p><div class="chartbox">${full.length>=2?lineChart(full.map(e=>fmtS(e.date)),[{vals:full.map(e=>e.ZC.em.some(m=>m.name.trim())?maxN(e.ZC.em):null),c:'var(--goal)'},{vals:full.map(e=>maxN(e.C.em)),c:'var(--now)'}],10,[0,2,4,6,8,10],'Natężenie emocji w kolejnych analizach'):'<p class="empty">Wykres pojawi się po co najmniej dwóch pełnych analizach.</p>'}</div><div class="legend"><span><i style="background:var(--now)"></i>C · jak jest</span><span><i style="background:var(--goal)"></i>ZC · jak chcę</span></div></div>
- <div class="panel"><h3>Zniekształcenia, które wracają</h3><p class="sub">Ile razy zaznaczono je przy myślach B.</p>${dArr.length?dArr.map(([id,n])=>`<div class="hbar"><span class="t" title="${h(DMAP[id].n)}">${DMAP[id].n}</span><span class="b"><i style="width:${n/dmax*100}%"></i></span><span class="n">${n}</span></div>`).join(''):'<p class="empty">Zaznacz zniekształcenia w analizie, żeby je tu zobaczyć.</p>'}</div>
  <div class="panel"><h3>Najczęstsze emocje</h3><p class="sub">Ile razy emocja pojawiła się w kroku C.</p>${emoArr.map(([t,n])=>`<div class="hbar"><span class="t">${h(t)}</span><span class="b"><i style="width:${n/emax*100}%"></i></span><span class="n">${n}</span></div>`).join('')||'<p class="empty">—</p>'}</div>
  <div class="panel"><h3>Gdzie myśli najczęściej nie przechodzą testu</h3><p class="sub">Odsetek odpowiedzi „nie” w Pięciu Pytaniach dla myśli B.</p>${QSHORT.map((q,i)=>{const p=qa[i]?Math.round(qn[i]/qa[i]*100):0;return `<div class="hbar"><span class="t">${i+1}. ${q}</span><span class="b"><i class="bal" style="width:${p}%"></i></span><span class="n">${qa[i]?p+'%':'—'}</span></div>`}).join('')}</div>
- <div class="panel"><h3>Powtarzające się myśli</h3><p class="sub">Pogrupowane według zniekształceń. To kandydaci na głębsze przekonania.</p><div class="recur">${dArr.slice(0,4).map(([id])=>`<div class="grp"><b>${DMAP[id].n}</b><ul>${groups[id].map(g=>`<li>${h(g.text)} <span>${fmtS(g.date)}</span></li>`).join('')}</ul></div>`).join('')||'<p class="empty">—</p>'}</div></div>
  <div class="panel wide"><h3>W kolejnych wersjach</h3><p class="sub">Pomysły odłożone na później.</p><div class="roadmap">
  ${[['Ćwiczenie RWE','Wyobrażenie z prowadzeniem, oddech i minutnik.'],['Skrócona RSA','Szybka wersja na trudny moment: B1–B3 i ZB1–ZB3.'],['Ponowna ocena emocji','Natężenie emocji z C przed i po pracy z myślami.'],['Przypięte zdrowe myśli','Wybrane ZB widoczne od razu po otwarciu aplikacji.'],['RSA II i łańcuchy','Twoja reakcja (C albo D) jako nowe A.'],['RSA zdrowej reakcji','Analiza sytuacji, która poszła dobrze. Twoje zasoby.'],['Kod PIN','Prosta blokada przy otwieraniu aplikacji.'],['Podsumowanie do udostępnienia','Czytelny tekst analizy, np. dla terapeuty.']].map(([a,b])=>`<div class="idea"><b>${a}</b>${b}</div>`).join('')}
  </div></div></div>`;
@@ -799,7 +738,7 @@ document.querySelector('nav').addEventListener('click',e=>{const b=e.target.clos
 app.addEventListener('input',e=>{
  const el=e.target;
  if(el.dataset.xpath&&S.xd){let v=el.value;if(el.type==='range'){v=+v;const o=el.parentNode.querySelector('output');if(o)o.textContent=v+(el.dataset.suf||'')}S.xd[el.dataset.xpath]=v;save();
-  if(el.dataset.xpath==='zbText'&&(v.trim()==='')!==(!document.getElementById('x-belZB'))){render();const t=document.getElementById('x-zbText');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length)}}return}
+  return}
  const p=el.dataset.path;if(!p||!S.draft)return;let v=el.value;if(el.type==='range'){v=+v;const o=el.parentNode.querySelector('output');if(o)o.textContent=v}setP(S.draft,p,v);save();updateHints();
 });
 app.addEventListener('click',e=>{
@@ -807,7 +746,7 @@ app.addEventListener('click',e=>{
  switch(a){
   case 'go':S.step=i;ui.railOpen=false;top0();break;
   case 'toggleRail':ui.railOpen=!ui.railOpen;render();return;
-  case 'next':S.step=Math.min(STEPS.length-1,S.step+1);top0();break;
+  case 'next':if(STEPS[S.step].k==='minus')d.status='full';S.step=Math.min(STEPS.length-1,S.step+1);top0();break;
   case 'prev':S.step=Math.max(0,S.step-1);top0();break;
   case 'add':{const arr=getP(d,b.dataset.path);arr.push(defFor(b.dataset.path));ui.focus=(/em$/.test(b.dataset.path)?'f-'+b.dataset.path.replace('.','-')+'-':'f-'+b.dataset.path+'-')+(arr.length-1);break}
   case 'del':{const arr=getP(d,b.dataset.path);arr.splice(i,1);if(!arr.length)arr.push(defFor(b.dataset.path));break}
@@ -818,16 +757,14 @@ app.addEventListener('click',e=>{
   case 'arrAdd':{const t=d.B[i];const lastL=t.arrow[t.arrow.length-1];if(lastL&&!lastL.text.trim()){toast('Najpierw odpowiedz na pytanie');return}t.arrow.push({qi:0,text:''});ui.focus='f-arr-'+t.id+'-'+(t.arrow.length-1);break}
   case 'arrDel':d.B[i].arrow.pop();break;
   case 'arrKey':{const t=d.B[i];const ans=[...t.arrow].reverse().find(l=>l.text.trim());if(!ans){toast('Najpierw wpisz odpowiedź');return}const txt=ans.text.trim();const ex=d.B.find(x=>x.keyFrom===t.id);if(ex)ex.text=txt;else d.B.splice(i+1,0,Object.assign(blankThought(),{text:txt,keyFrom:t.id}));ui.arrowOpen[t.id]=false;toast('Dodano przekonanie kluczowe do B');break}
-  case 'dist':{const t=d.B[i],v=b.dataset.v;t.dist=t.dist.includes(v)?t.dist.filter(x=>x!==v):[...t.dist,v];break}
-  case 'distAll':ui.showAll[b.dataset.id]=!ui.showAll[b.dataset.id];break;
   case 'quickB':{const inp=document.getElementById('quickB');if(!inp.value.trim())return;addToB(inp.value);break}
   case 'toB':addToB(b.dataset.v);break;
   case 'q':{const q=d.B[i].q,qi=+b.dataset.qi,v=b.dataset.v==='1';q[qi]=q[qi]===v?null:v;break}
   case 'zq':{const q=d.B[i].zb.q,qi=+b.dataset.qi,v=b.dataset.v==='1';q[qi]=q[qi]===v?null:v;break}
   case 'zacc':{const z=d.B[i].zb,v=b.dataset.v==='1';z.accept=z.accept===v?null:v;break}
   case 'zbq':ui.zbq[b.dataset.id]=!ui.zbq[b.dataset.id];break;
-  case 'decide':if(b.dataset.v==='go'){d.status='full';S.step++;}else{d.status='left';S.step=SIDX.S}top0();break;
   case 'discard':if(b.dataset.sure){S.draft=null;S.editing=null;S.step=0;toast('Formularz wyczyszczony')}else{b.dataset.sure='1';b.textContent='Na pewno? Kliknij jeszcze raz';b.classList.add('danger');return}break;
+  case 'saveLeft':d.status='left';/* fallthrough */
   case 'saveEntry':{const copy=clone(d);copy.example=false;if(!copy.status)copy.status='full';if(S.editing){const k=S.entries.findIndex(x=>x.id===S.editing);if(k>=0)S.entries[k]=copy;else S.entries.push(copy)}else S.entries.push(copy);S.draft=null;S.editing=null;S.step=0;save();toast('Zapisano w dzienniku');ui.openId=copy.id;ui.view='log';top0();break}
   case 'newEntry':ui.view='new';top0();break;
   case 'open':ui.openId=b.dataset.id;top0();break;
@@ -844,17 +781,14 @@ app.addEventListener('click',e=>{
   case 'xnew':S.xd=blankExp();S.xmode='plan';S.xstep=0;ui.view='exp';top0();break;
   case 'xfromEntry':S.xd=blankExp({entryId:b.dataset.id});S.xmode='plan';S.xstep=0;ui.view='exp';top0();break;
   case 'xfree':S.xd.free=true;break;
-  case 'xrung':{const base=S.exps.find(x=>x.id===b.dataset.id);S.xd=blankExp({entryId:base.entryId,bId:base.bId,bText:base.bText,zbText:base.zbText,belB:base.belBAfter??base.belB,belZB:base.belZBAfter??base.belZB,diff:Math.min(10,base.diff+1),type:base.type});S.xmode='plan';S.xstep=0;top0();break}
-  case 'xpick':{const [en,bb]=findB(b.dataset.e,b.dataset.b);if(!bb)return;S.xd.entryId=en.id;S.xd.bId=bb.id;S.xd.bText=bb.text;if(bb.zb&&bb.zb.text.trim())S.xd.zbText=bb.zb.text;break}
-  case 'xtype':S.xd.type=b.dataset.v;break;
-  case 'xidea':S.xd.plan=S.xd.plan.trim()?S.xd.plan.trim()+'\n'+b.dataset.v:b.dataset.v;toast('Dodano do planu');break;
-  case 'xpred':S.xd.prediction=b.dataset.v;break;
+  case 'xrung':{const base=S.exps.find(x=>x.id===b.dataset.id);S.xd=blankExp({entryId:base.entryId,bId:base.bId,bText:base.bText,belB:base.belBAfter??base.belB,diff:Math.min(10,base.diff+1)});S.xmode='plan';S.xstep=0;top0();break}
+  case 'xpick':{const [en,bb]=findB(b.dataset.e,b.dataset.b);if(!bb)return;S.xd.entryId=en.id;S.xd.bId=bb.id;S.xd.bText=bb.text;break}
   case 'xout':S.xd.outcome=S.xd.outcome===b.dataset.v?null:b.dataset.v;break;
-  case 'xnext':{const k=(S.xmode==='plan'?XPLAN:XRES)[S.xstep].k;if(k==='thought'&&!S.xd.bText.trim()){toast('Wybierz albo wpisz myśl');return}if(k==='pred'&&!S.xd.prediction.trim()){toast('Zapisz, czego się spodziewasz');return}S.xstep++;top0();break}
+  case 'xnext':{const k=(S.xmode==='plan'?XPLAN:XRES)[S.xstep].k;if(k==='thought'&&!S.xd.bText.trim()){toast('Wybierz albo wpisz myśl');return}if(k==='pred'&&!S.xd.prediction.trim()){toast('Zapisz, co by się stało');return}S.xstep++;top0();break}
   case 'xprev':S.xstep=Math.max(0,S.xstep-1);top0();break;
   case 'xcancel':if(b.dataset.sure){S.xd=null;S.xstep=0}else{b.dataset.sure='1';b.textContent='Na pewno?';b.classList.add('danger');return}break;
   case 'xsave':{const x=clone(S.xd);delete x.free;if(S.xmode==='plan'){if(!x.plan.trim()){toast('Wpisz, co dokładnie zrobisz');return}x.status='planned'}else{x.status='done';x.doneDate=today()}x.example=false;const k=S.exps.findIndex(y=>y.id===x.id);if(k>=0)S.exps[k]=x;else S.exps.push(x);toast(S.xmode==='plan'?'Eksperyment zaplanowany':'Zapisano wynik');S.xd=null;S.xstep=0;top0();break}
-  case 'xres':{const x=clone(S.exps.find(y=>y.id===b.dataset.id));if(x.belBAfter==null)x.belBAfter=x.belB;if(x.belZBAfter==null)x.belZBAfter=x.belZB;S.xd=x;S.xmode='result';S.xstep=0;top0();break}
+  case 'xres':{const x=clone(S.exps.find(y=>y.id===b.dataset.id));if(x.belBAfter==null)x.belBAfter=x.belB;S.xd=x;S.xmode='result';S.xstep=0;top0();break}
   case 'xics':icsDownload(S.exps.find(y=>y.id===b.dataset.id));return;
   case 'xdel':if(b.dataset.sure){S.exps=S.exps.filter(x=>x.id!==b.dataset.id);toast('Eksperyment usunięty')}else{b.dataset.sure='1';b.textContent='Na pewno usunąć?';b.style.color='var(--danger)';return}break;
  }
