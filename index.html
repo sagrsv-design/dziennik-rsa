@@ -121,6 +121,8 @@ label.f small{font-weight:400;color:var(--muted)}
 textarea,input[type=text],input[type=date],input[type=time]{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);padding:10px 12px;resize:vertical;font-weight:400}
 textarea:focus,input:focus{border-color:var(--goal);outline:none;background:var(--surface)}
 .row2{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.row2>label{min-width:0}
+input[type=date],input[type=time]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;min-height:46px}
 .listitem{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start}
 .listitem .tag{font-family:var(--display);color:var(--muted);padding-top:9px;min-width:1.4em}
 .thought{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg);min-width:0}
@@ -142,6 +144,7 @@ textarea:focus,input:focus{border-color:var(--goal);outline:none;background:var(
 input[type=range]{width:100%;accent-color:var(--now)}
 .side-goal input[type=range],.rg-goal{accent-color:var(--goal)}
 .side-exp input[type=range]{accent-color:var(--bal)}
+.side-exp input[type=range].rg-goal,.side-goal input[type=range]{accent-color:var(--goal)}
 .slider{display:grid;grid-template-columns:minmax(0,1fr) 3.4em;gap:10px;align-items:center}
 .slider output{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
 .note{background:var(--bal-soft);border-radius:var(--r);padding:12px 14px;font-size:.92rem;display:flex;flex-direction:column;gap:8px}
@@ -236,16 +239,56 @@ details.backup summary{cursor:pointer;font-weight:600;color:var(--muted)}
 .xcard p{margin:0;font-size:.92rem}
 .xcard .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
 .ladder{display:flex;flex-direction:column;gap:0;margin-top:4px}
-.rung{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;position:relative}
-.rung::before{content:"";position:absolute;left:16px;top:34px;bottom:-4px;width:2px;background:var(--line)}
+.rung{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;position:relative;padding-bottom:14px}
+.rung::before{content:"";position:absolute;left:16px;top:38px;bottom:2px;width:2px;background:var(--line)}
 .rung:last-child::before{display:none}
-.rung .deg{width:34px;height:34px;border-radius:50%;background:var(--bal-soft);color:var(--bal);display:grid;place-items:center;font-weight:700;font-size:.85rem;font-variant-numeric:tabular-nums}
-.rung details{padding-bottom:12px;min-width:0}
-.rung summary{cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:4px;padding-top:6px;font-size:.93rem}
-.rung summary::-webkit-details-marker{display:none}
+.rung .deg{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.85rem;font-variant-numeric:tabular-nums;background:var(--bal);color:var(--surface)}
+.rung.plan .deg{background:var(--bal-soft);color:var(--bal);box-shadow:inset 0 0 0 2px var(--bal)}
+.rung.todo .deg{background:var(--surface);color:var(--muted);box-shadow:inset 0 0 0 2px var(--line)}
+.rung .rb{min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:6px;font-size:.93rem}
+.rung.todo .rb>span:first-child{color:var(--muted)}
+.rung .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted)}
+details.rb summary{cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:4px}
+details.rb summary::-webkit-details-marker{display:none}
 .rung .body{display:flex;flex-direction:column;gap:6px;font-size:.9rem;padding-top:8px}
 .change{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--muted)}
 .change b{color:var(--ink)}
+
+/* experiments: extra */
+.divider{height:1px;background:var(--line);margin:2px 0}
+.rowhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.twobtn{display:flex;gap:8px;flex-wrap:wrap}
+.pickbox summary{font-weight:500;color:var(--muted)}
+.pgroup{display:flex;flex-direction:column;gap:6px}
+.pgroup+.pgroup{margin-top:6px}
+.ptitle{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.pick{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;cursor:pointer;font-size:.92rem;min-height:44px}
+.pick:hover{border-color:var(--muted)}
+.pk{font-family:var(--display);color:var(--now);font-size:.95rem;min-width:1.9em}
+.pk.g{color:var(--goal)}
+.tcard.radio{flex-direction:row;align-items:center;gap:10px;min-height:48px}
+.tcard.radio::before{content:"";width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--line);flex:0 0 auto}
+.tcard.radio[aria-pressed="true"]::before{box-shadow:inset 0 0 0 5px var(--bal)}
+.edulink{margin-bottom:8px}
+.lstep{display:grid;grid-template-columns:3.4em minmax(0,1fr) auto;gap:8px;align-items:start}
+.dsel select{width:100%;min-height:44px;border:1px solid var(--line);background:var(--bal-soft);color:var(--bal);font-weight:700;border-radius:var(--r);padding:0 6px;text-align:center;font-size:1rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.edu{display:flex;flex-direction:column;gap:12px;padding-bottom:24px}
+.edu h2{font-size:clamp(1.4rem,3.4vw,1.9rem);margin-bottom:4px}
+.edu h3{font-size:1.15rem;margin-top:10px}
+.edu p{margin:0;max-width:64ch}
+.edu ul.plain{display:flex;flex-direction:column;gap:6px;max-width:64ch}
+.cats{display:grid;gap:10px}
+.cat{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg);display:flex;flex-direction:column;gap:8px}
+.cathead{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;font-size:.95rem}
+.cathead span{color:var(--muted)}
+.catnum{width:28px;height:28px;border-radius:50%;background:var(--now-soft);color:var(--now)!important;display:grid;place-items:center;font-weight:700;font-size:.85rem}
+.cat ul{font-size:.92rem;display:flex;flex-direction:column;gap:3px;margin-left:38px;padding-left:16px}
+.swaps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.swap{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+.swap .tagc{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.swap .was{color:var(--now);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--now) 50%,transparent)}
+.swap .now{color:var(--goal);font-weight:600}
 
 /* patterns */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
@@ -331,6 +374,8 @@ details.backup summary{cursor:pointer;font-weight:600;color:var(--muted)}
   .list{grid-template-columns:1fr}
   .hbar{grid-template-columns:minmax(0,1.5fr) 1fr 2.6em}
   .toolbar h2{font-size:1.35rem}
+  .cat ul{margin-left:0}
+  .swaps{grid-template-columns:1fr}
   .panel{padding:16px}
   .toast{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   .foot{margin-top:28px}
@@ -356,7 +401,7 @@ details.backup summary{cursor:pointer;font-weight:600;color:var(--muted)}
 <script>
 (function(){
 const KEY='rsa-dziennik-v1';
-const VER=3;
+const VER=4;
 
 /* ---------- treści ---------- */
 const QUESTIONS=['Czy ta myśl jest oparta na oczywistych faktach?','Czy ta myśl (najlepiej) chroni moje życie i zdrowie?','Czy ta myśl (najlepiej) pomaga mi osiągać moje bliższe i dalsze cele?','Czy ta myśl (najlepiej) pomaga mi unikać najbardziej niepożądanych konfliktów lub sobie z nimi radzić?','Czy ta myśl pomaga mi czuć się tak, jak chcę, bez nadużywania żadnych substancji?'];
@@ -367,7 +412,6 @@ const PROBES=[
  {s:'Jakie ma znaczenie?',q:'A jakie to ma dla ciebie znaczenie?'},
  {s:'Co byłoby najgorsze?',q:'Gdyby to było prawdą, co by było w tym dla ciebie najgorsze?'}
 ];
-const OUT={yes:['Sprawdziło się','pill'],partly:['Częściowo','pill ex'],no:['Nie sprawdziło się','pill goal']};
 
 const STEPS=[
  {k:'A',L:'A',n:'1',side:'now',sep:'Jak jest',r:'Sytuacja',t:'Co się wydarzyło?',h:'Opisz sytuację: co się wydarzyło albo co się teraz dzieje. Jeśli robisz RSA później, przypomnij sobie sytuację jak najdokładniej, jakby to był film.'},
@@ -388,13 +432,13 @@ const STEPS=[
 const SIDX=Object.fromEntries(STEPS.map((s,i)=>[s.k,i]));
 
 const XPLAN=[
- {k:'thought',t:'Którą myśl sprawdzisz?',h:'Wybierz myśl B z analizy albo wpisz inną. Oceń, na ile w nią teraz wierzysz.'},
- {k:'pred',t:'Co by się stało, gdyby to była prawda?',h:'Eksperyment sprawdza konkretne przewidywanie, a nie ogólną myśl. Zamień myśl na przewidywanie, które da się sprawdzić w prawdziwym życiu.'},
- {k:'plan',t:'Twój plan',h:'Co dokładnie zrobisz i kiedy? Mały krok wystarczy. Nie zaczynaj od najtrudniejszej sytuacji.'}
+ {k:'thought',r:'Myśl',t:'Którą myśl sprawdzisz?',h:'Wpisz myśl, którą chcesz sprawdzić, i oceń, na ile w nią wierzysz. Możesz też dodać myśl alternatywną. Obie możesz wybrać z analizy.'},
+ {k:'pred',r:'Przewidywanie',t:'Co by się stało, gdyby to była prawda?',h:'Eksperyment sprawdza konkretne przewidywanie, a nie ogólną myśl. Zamień myśl na przewidywanie i ustal, po czym poznasz, czy się sprawdziło.'},
+ {k:'plan',r:'Plan',t:'Twój plan',h:'Co dokładnie zrobisz i kiedy? Mały krok wystarczy. Nie zaczynaj od najtrudniejszej sytuacji.'}
 ];
 const XRES=[
- {k:'res',t:'Co się wydarzyło?',h:'Opisz tylko fakty, jak w Teście Kamery: kto co powiedział i zrobił. Bez ocen i domysłów.'},
- {k:'concl',t:'Jaki jest wniosek?',h:'Porównaj to, co się wydarzyło, ze swoim przewidywaniem. Potem oceń myśl jeszcze raz.'}
+ {k:'res',r:'Wynik',t:'Co się wydarzyło?',h:'Opisz tylko fakty, jak w Teście Kamery: kto co powiedział i zrobił. Bez ocen i domysłów.'},
+ {k:'concl',r:'Wniosek',t:'Jaki jest wniosek?',h:'Porównaj to, co się wydarzyło, z przewidywaniami. Potem oceń myśli jeszcze raz.'}
 ];
 
 /* ---------- pomocnicze ---------- */
@@ -408,7 +452,8 @@ const cap=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
 const blankZB=()=>({text:'',q:N5(),accept:null});
 const blankThought=()=>({id:uid(),text:'',dist:[],q:N5(),arrow:[],keyFrom:null,zb:blankZB()});
 function blank(){return{id:uid(),date:today(),title:'',status:'',A:'',B:[blankThought()],C:{em:[{name:'',n:5}],body:'',impulse:''},D:'',plus:[''],minus:[''],ZC:{em:[{name:'',n:3}],body:''},ZD:'',cost:[''],gain:[''],ZA:'',example:false}}
-function blankExp(o){return Object.assign({id:uid(),example:false,entryId:null,bId:null,bText:'',belB:70,zbText:'',belZB:30,type:'do',prediction:'',predConf:70,plan:'',date:inDays(1),time:'18:00',diff:3,safety:'',obstacles:'',status:'planned',result:'',outcome:null,learned:'',belBAfter:null,belZBAfter:null,doneDate:null},o||{})}
+function blankExp(o){return Object.assign({id:uid(),example:false,entryId:null,bId:null,bText:'',belB:70,altText:'',belAlt:30,prediction:'',criterion:'',altPred:'',plan:'',date:inDays(1),time:'18:00',diff:3,safety:'',instead:'',status:'planned',result:'',safetyDone:null,closer:null,learned:'',belBAfter:null,belAltAfter:null,doneDate:null},o||{})}
+function migrateExp(x){if(!x)return x;if(x.altText==null){x.altText=x.zbText||'';x.belAlt=x.belZB??30;x.belAltAfter=x.belZBAfter??null}['zbText','belZB','belZBAfter','type','predConf','obstacles'].forEach(k=>delete x[k]);if(x.closer==null&&x.outcome)x.closer=({yes:'b',partly:'mid',no:'none'})[x.outcome]||null;delete x.outcome;['criterion','altPred','instead','safety','result','learned','plan','prediction'].forEach(k=>{if(x[k]==null)x[k]=''});if(x.safetyDone===undefined)x.safetyDone=null;return x}
 const clone=o=>JSON.parse(JSON.stringify(o));
 
 function migrate(e){
@@ -436,31 +481,34 @@ function samples(){
  ];
 }
 function sampleExps(){
+ const E=(o)=>blankExp(Object.assign({example:true},o));
  return [
- blankExp({id:'x1',example:true,entryId:'ex1',bId:'b11',bText:'Muszę oddać idealny tekst, inaczej się skompromituję.',belB:85,zbText:'Chcę oddać dobry tekst. Poprawki są normalną częścią pisania.',belZB:25,type:'do',prediction:'Promotor ostro skrytykuje rozdział oddany po jednym czytaniu.',predConf:80,plan:'Wysłać rozdział po jednym czytaniu, bez poprawiania do nocy.',date:'2026-10-10',diff:4,safety:'Zwykle czytam tekst pięć razy i przepraszam w mailu za błędy.',status:'done',result:'Promotor odpisał po dwóch dniach. Zaznaczył 6 drobnych uwag. Napisał: „Proszę kontynuować”.',outcome:'no',learned:'Nie musiałam poprawiać do nocy. Uwag było mniej niż zwykle.',belBAfter:55,belZBAfter:50,doneDate:'2026-10-12'}),
- blankExp({id:'x2',example:true,entryId:'ex2',bId:'b21',bText:'Pewnie ma mnie dość.',belB:70,zbText:'Nie wiem, dlaczego nie odpisał. Ludzie bywają zajęci.',belZB:40,type:'ask',prediction:'Powie, że ma mnie dość, albo odpisze chłodno.',predConf:60,plan:'Zapytać znajomego wprost, czy wszystko w porządku.',date:'2026-10-16',diff:3,status:'done',result:'Odpisał po godzinie: „Sorry, miałem urwanie głowy w pracy. Wyskoczymy w piątek?”',outcome:'no',learned:'Cisza nie znaczyła, że ma mnie dość.',belBAfter:20,belZBAfter:80,doneDate:'2026-10-16'}),
- blankExp({id:'x3',example:true,entryId:'ex4',bId:'b42',bText:'Wszyscy zobaczą, że się nie nadaję.',belB:65,zbText:'Jedna prezentacja nie mówi o mnie wszystkiego.',belZB:45,type:'do',prediction:'Ktoś się zaśmieje albo prowadzący uzna pytanie za głupie.',predConf:70,plan:'Zadać pytanie na seminarium bez przygotowanej kartki.',date:'2026-10-30',diff:5,safety:'Zwykle zapisuję pytanie na kartce i mówię bardzo cicho.',status:'done',result:'Zadałam pytanie. Prowadzący odpowiadał przez dwie minuty. Jedna osoba pokiwała głową.',outcome:'no',learned:'Nikt się nie zaśmiał. Pytanie przydało się też innym.',belBAfter:40,belZBAfter:65,doneDate:'2026-10-30'}),
- blankExp({id:'x4',example:true,entryId:'ex1',bId:'b11',bText:'Muszę oddać idealny tekst, inaczej się skompromituję.',belB:55,zbText:'Chcę oddać dobry tekst. Poprawki są normalną częścią pisania.',belZB:50,type:'do',prediction:'Promotor uzna, że się nie staram.',predConf:65,plan:'Oddać fragment z celowo niedopracowanym wstępem i zapytać o kierunek.',date:'2026-11-10',diff:7,safety:'Nie dopisuję przeprosin w mailu.'})
+ E({id:'x1',entryId:'ex1',bId:'b11',bText:'Muszę oddać idealny tekst, inaczej się skompromituję.',belB:85,altText:'Chcę oddać dobry tekst. Poprawki są normalną częścią pisania.',belAlt:25,prediction:'Jeśli oddam rozdział po jednym czytaniu, promotor ostro go skrytykuje.',criterion:'Napisze, że rozdział jest słaby albo trzeba go napisać od nowa.',altPred:'Dostanę kilka drobnych uwag, jak zwykle.',plan:'Wysłać rozdział po jednym czytaniu.',date:'2026-10-10',diff:4,safety:'Czytam tekst pięć razy i przepraszam w mailu za błędy.',instead:'Czytam raz i wysyłam bez przeprosin.',status:'done',result:'Promotor odpisał po dwóch dniach. Zaznaczył 6 drobnych uwag. Napisał: „Proszę kontynuować”.',safetyDone:'yes',closer:'alt',learned:'Nie musiałam poprawiać do nocy. Uwag było mniej niż zwykle.',belBAfter:55,belAltAfter:50,doneDate:'2026-10-12'}),
+ E({id:'x4',entryId:'ex1',bId:'b11',bText:'Muszę oddać idealny tekst, inaczej się skompromituję.',belB:55,altText:'Chcę oddać dobry tekst. Poprawki są normalną częścią pisania.',belAlt:50,prediction:'Jeśli oddam fragment z niedopracowanym wstępem, promotor uzna, że się nie staram.',criterion:'Napisze coś w stylu „proszę się bardziej przyłożyć”.',plan:'Oddać fragment z celowo niedopracowanym wstępem i zapytać o kierunek.',date:'2026-11-10',diff:7,safety:'Dopisuję przeprosiny w mailu.',instead:'Piszę krótko, o co pytam.'}),
+ E({id:'x5',entryId:'ex1',bText:'Muszę oddać idealny tekst, inaczej się skompromituję.',plan:'Wysłać promotorowi cały rozdział bez trzeciej rundy poprawek.',diff:9,status:'todo',date:''}),
+ E({id:'x2',entryId:'ex2',bId:'b21',bText:'Pewnie ma mnie dość.',belB:70,altText:'Nie wiem, dlaczego nie odpisał. Ludzie bywają zajęci.',belAlt:40,prediction:'Jeśli zapytam go wprost, odpisze chłodno albo powie, że ma mnie dość.',criterion:'Odpowie krótko, bez propozycji spotkania, albo wcale.',altPred:'Okaże się, że był zajęty.',plan:'Zapytać znajomego wprost, czy wszystko w porządku.',date:'2026-10-16',diff:3,safety:'Sprawdzam telefon co kilka minut.',instead:'Odkładam telefon do torby na godzinę.',status:'done',result:'Odpisał po godzinie: „Sorry, miałem urwanie głowy w pracy. Wyskoczymy w piątek?”',safetyDone:'partly',closer:'alt',learned:'Cisza nie znaczyła, że ma mnie dość.',belBAfter:20,belAltAfter:80,doneDate:'2026-10-16'}),
+ E({id:'x3',entryId:'ex4',bId:'b42',bText:'Wszyscy zobaczą, że się nie nadaję.',belB:65,altText:'Jedna prezentacja nie mówi o mnie wszystkiego.',belAlt:45,prediction:'Jeśli zadam pytanie na seminarium, ktoś się zaśmieje albo prowadzący uzna je za głupie.',criterion:'Ktoś parsknie śmiechem albo prowadzący skomentuje pytanie z przekąsem.',plan:'Zadać pytanie na seminarium bez przygotowanej kartki.',date:'2026-10-30',diff:5,safety:'Zapisuję pytanie na kartce i mówię bardzo cicho.',instead:'Mówię z głowy, normalnym głosem.',status:'done',result:'Zadałam pytanie. Prowadzący odpowiadał przez dwie minuty. Jedna osoba pokiwała głową.',safetyDone:'yes',closer:'none',learned:'Nikt się nie zaśmiał. Pytanie przydało się też innym.',belBAfter:40,belAltAfter:65,doneDate:'2026-10-30'}),
+ E({id:'x6',entryId:'ex4',bText:'Wszyscy zobaczą, że się nie nadaję.',plan:'Zadać pytanie koleżance po zajęciach.',diff:2,status:'done',belB:70,belBAfter:65,prediction:'Uzna, że nie rozumiem podstaw.',result:'Wytłumaczyła mi i powiedziała, że też tego nie łapała.',closer:'none',learned:'Inni też mają pytania.',date:'2026-10-24',doneDate:'2026-10-24'}),
+ E({id:'x7',entryId:'ex4',bText:'Wszyscy zobaczą, że się nie nadaję.',plan:'Zrobić krótką prezentację bez kartki.',diff:8,status:'todo',date:''})
  ];
 }
-
 /* ---------- stan ---------- */
-let S={entries:[],exps:[],draft:null,editing:null,step:0,xd:null,xmode:'plan',xstep:0};
-const ui={view:'new',openId:null,railOpen:false,arrowOpen:{},showAll:{},zbq:{},focus:null};
+let S={entries:[],exps:[],draft:null,editing:null,step:0,xd:null,xmode:'plan',xstep:0,ld:null};
+const ui={view:'new',openId:null,railOpen:false,arrowOpen:{},zbq:{},focus:null,sub:null};
 function load(){
  try{const s=JSON.parse(localStorage.getItem(KEY)||'null');
   if(s&&Array.isArray(s.entries)){
-   S.entries=s.entries.map(migrate);S.exps=Array.isArray(s.exps)?s.exps:[];
+   S.entries=s.entries.map(migrate);S.exps=(Array.isArray(s.exps)?s.exps:[]).map(migrateExp);
    const old=!s.v||s.v<VER;
    if(old){if(S.entries.some(e=>e.example)||S.exps.some(x=>x.example)){S.entries=S.entries.filter(e=>!e.example).concat(samples());S.exps=S.exps.filter(x=>!x.example).concat(sampleExps())}S.step=0}
    else S.step=Math.min(STEPS.length-1,Math.max(0,s.step|0));
    S.draft=s.draft?migrate(s.draft):null;S.editing=s.editing||null;
-   S.xd=old?null:(s.xd||null);S.xmode=s.xmode||'plan';S.xstep=old?0:(s.xstep|0);
+   S.xd=old?null:(s.xd?migrateExp(s.xd):null);S.ld=old?null:(s.ld||null);S.xmode=s.xmode||'plan';S.xstep=old?0:(s.xstep|0);
    return}
  }catch(e){}
  S.entries=samples();S.exps=sampleExps();
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify({v:VER,entries:S.entries,exps:S.exps,draft:S.draft,editing:S.editing,step:S.step,xd:S.xd,xmode:S.xmode,xstep:S.xstep}))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({v:VER,entries:S.entries,exps:S.exps,draft:S.draft,editing:S.editing,step:S.step,xd:S.xd,xmode:S.xmode,xstep:S.xstep,ld:S.ld}))}catch(e){}}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2400)}
 function getP(o,p){return p.split('.').reduce((a,k)=>a==null?a:a[k],o)}
 function setP(o,p,v){const ks=p.split('.');const last=ks.pop();const t=ks.reduce((a,k)=>a[k],o);t[last]=v}
@@ -621,44 +669,90 @@ function renderLog(){
 
 /* ---------- widok: eksperymenty ---------- */
 function findB(entryId,bId){const e=S.entries.find(x=>x.id===entryId);if(!e)return[null,null];return [e,e.B.find(b=>b.id===bId)||null]}
-function candThoughts(entryId){
- const ents=entryId?S.entries.filter(e=>e.id===entryId):sorted();const out=[],seen=new Set();
- ents.forEach(e=>{[...e.B].sort((a,b)=>(b.keyFrom?1:0)-(a.keyFrom?1:0)).forEach(b=>{const t=b.text.trim();if(!t||seen.has(t.toLowerCase()))return;seen.add(t.toLowerCase());out.push({e,b})})});
- return out.slice(0,12);
-}
 const xsl=(path,label,val,min,max,suf,cls='')=>`<label class="f">${label}<span class="slider"><input type="range" class="${cls}" id="x-${path}" min="${min}" max="${max}" data-xpath="${path}" data-suf="${suf}" value="${val}"><output>${val}${suf}</output></span></label>`;
 const xta=(path,label,ph,rows=3,sub='')=>`<label class="f">${label}${sub?` <small>${sub}</small>`:''}<textarea id="x-${path}" data-xpath="${path}" rows="${rows}" placeholder="${h(ph)}">${h(S.xd[path])}</textarea></label>`;
+/* lista myśli z analiz do rozwijanego wyboru */
+function picker(target,firstEntry,open){
+ const ents=sorted();if(firstEntry){const k=ents.findIndex(e=>e.id===firstEntry);if(k>0)ents.unshift(ents.splice(k,1)[0])}
+ const groups=ents.map(e=>{const items=[];e.B.forEach(b=>{if(b.text.trim())items.push(['B',b,b.text]);});e.B.forEach(b=>{if(b.zb&&b.zb.text.trim())items.push(['ZB',b,b.zb.text])});return [e,items]}).filter(g=>g[1].length).slice(0,6);
+ if(!groups.length)return '';
+ return `<details class="more pickbox"${open?' open':''}><summary>Dodaj z analizy</summary><div class="in">${groups.map(([e,items])=>`<div class="pgroup"><span class="ptitle">${h(e.title||'Bez nazwy')} · ${fmtS(e.date)}</span>${items.map(([k,b,t])=>`<button class="pick" data-act="xpick" data-t="${target}" data-e="${e.id}" data-b="${b.id}" data-k="${k}"><span class="pk ${k==='ZB'?'g':''}">${k}</span><span>${h(t)}</span></button>`).join('')}</div>`).join('')}</div></details>`;
+}
+const CLOSER=[['b','Bliżej przewidywania myśli B','pill'],['alt','Bliżej przewidywania myśli alternatywnej','pill goal'],['mid','Gdzieś pośrodku','pill ex'],['none','Żadne, stało się coś innego','pill mute']];
+const CMAP=Object.fromEntries(CLOSER.map(c=>[c[0],c]));
+const CSHORT={b:'Bliżej B',alt:'Bliżej alternatywnej',mid:'Pośrodku',none:'Coś innego'};
+const SAFE={yes:'Tak',partly:'Częściowo',no:'Nie'};
 function xBody(k){
  const x=S.xd;
  switch(k){
-  case 'thought':{const c=candThoughts(x.entryId&&!x.free?x.entryId:null);
-   return (c.length?`<div class="stack"><div class="eyebrow">Myśli z Twoich analiz</div><div class="tcards">${c.map(o=>`<button class="tcard" data-act="xpick" data-e="${o.e.id}" data-b="${o.b.id}" aria-pressed="${x.bId===o.b.id}"><span>${h(o.b.text)}</span><span class="src">${h(o.e.title||'Bez nazwy')} · ${fmtS(o.e.date)}${o.b.keyFrom?' · przekonanie kluczowe':''}</span></button>`).join('')}</div>${x.entryId&&!x.free?`<button class="btn small ghost add" data-act="xfree">Pokaż myśli ze wszystkich analiz</button>`:''}</div>`:'')+
-   xta('bText',c.length?'Albo wpisz inną myśl':'Myśl do sprawdzenia','Np. Jestem do niczego.',2)+
-   xsl('belB','Na ile w nią teraz wierzysz?',x.belB,0,100,'%');}
+  case 'thought':return `<label class="f">Myśl do sprawdzenia<textarea id="x-bText" data-xpath="bText" rows="2" placeholder="Np. Jestem do niczego.">${h(x.bText)}</textarea></label>${picker('bText',x.entryId,!!x.entryId&&!x.bText.trim())}`+
+   xsl('belB','Na ile w nią teraz wierzysz?',x.belB,0,100,'%')+
+   `<div class="divider"></div><label class="f">Myśl alternatywna <small>opcjonalnie</small><textarea id="x-altText" data-xpath="altText" rows="2" placeholder="Np. Uczę się i coraz lepiej mi idzie.">${h(x.altText)}</textarea></label>${picker('altText',x.entryId,false)}`+
+   (x.altText.trim()?xsl('belAlt','Na ile wierzysz w myśl alternatywną?',x.belAlt,0,100,'%','rg-goal'):'')+
+   `<p class="score">Nie każdą myśl da się sprawdzić eksperymentem. Myśli o wartościach albo dalekiej przyszłości lepiej przepracować w RSA. Możesz za to sprawdzać mniejsze przewidywania, które z nich wynikają.</p>`;
   case 'pred':return `<div class="pairB"><b>B</b>${h(x.bText)}</div>
-   <div class="note"><span><b>Przykład</b></span><span>Myśl: <i>Jestem do niczego.</i></span><span>Przewidywanie: <i>Jeśli to prawda, to gdy oddam rozdział, promotor uzna go za bezwartościowy.</i></span></div>`+
-   xta('prediction','Gdyby ta myśl była prawdziwa, co by się stało, gdy…?','Jeśli to prawda, to gdy…, wtedy…',3);
-  case 'plan':return `<div class="pairB"><b>Przewidywanie</b>${h(x.prediction)}</div>`+xta('plan','Co dokładnie zrobisz, żeby to sprawdzić?','Np. Oddam rozdział w piątek i przeczytam, co dokładnie napisze promotor.',3)+
+   <div class="note"><span><b>Przykład</b> · Myśl: <i>Jestem do niczego.</i> → Przewidywanie: <i>Jeśli to prawda, to gdy oddam rozdział, promotor uzna go za bezwartościowy.</i> → Poznam to po tym, że: <i>napisze, że rozdział trzeba napisać od nowa.</i></span></div>`+
+   xta('prediction','Gdyby ta myśl była prawdziwa, co by się stało, gdy…?','Jeśli to prawda, to gdy…',3)+
+   xta('criterion','Po czym poznasz, że przewidywanie się sprawdziło?','Konkretny znak, który dałoby się nagrać kamerą…',2)+
+   (x.altText.trim()?`<div class="divider"></div><div class="pairB g"><b>Alt.</b>${h(x.altText)}</div>`+xta('altPred','Co przewiduje myśl alternatywna?','Np. Dostanę kilka uwag, jak zwykle.',2,'opcjonalnie'):'');
+  case 'plan':return `<div class="pairB"><b>Przewidywanie</b>${h(x.prediction)}</div>`+xta('plan','Co dokładnie zrobisz?','Np. Oddam rozdział w piątek i przeczytam, co napisze promotor.',3)+
    `<div class="row2"><label class="f">Kiedy?<input type="date" id="x-date" data-xpath="date" value="${h(x.date)}"></label><label class="f">O której?<input type="time" id="x-time" data-xpath="time" value="${h(x.time)}"></label></div>`+
    xsl('diff','Trudność (1 = łatwo, 10 = bardzo trudno)',x.diff,1,10,'')+
+   `<div class="divider"></div><div class="rowhead"><span class="eyebrow">Zabezpieczenia</span><button class="btn small" data-act="xedu">ⓘ Czym są zabezpieczenia?</button></div>`+
+   xta('safety','Z jakiego zabezpieczenia rezygnujesz?','Np. nie czytam tekstu dziesięć razy przed wysłaniem.',2,'opcjonalnie')+
+   xta('instead','Co zrobisz zamiast tego?','Np. czytam raz i wysyłam od razu.',2,'opcjonalnie')+
    `<p class="score">Eksperyment nie może zagrażać Twojemu zdrowiu ani poważnie szkodzić relacjom. Jeśli masz wątpliwości, wybierz mniejszy krok.</p>`;
-  case 'res':return `<div class="pairB o"><b>Plan</b>${h(x.plan)}</div><div class="pairB"><b>Przewidywanie</b>${h(x.prediction)}</div>`+xta('result','Co się wydarzyło?','Kto co powiedział i zrobił…',5);
-  case 'concl':return `<div class="pairB"><b>Przewidywanie</b>${h(x.prediction)}</div><div class="stack"><div class="eyebrow">Czy przewidywanie się sprawdziło?</div><div class="seg" role="group" style="align-self:flex-start"><button class="yes" data-act="xout" data-v="no" aria-pressed="${x.outcome==='no'}">Nie</button><button class="mid" data-act="xout" data-v="partly" aria-pressed="${x.outcome==='partly'}">Częściowo</button><button class="no" data-act="xout" data-v="yes" aria-pressed="${x.outcome==='yes'}">Tak</button></div></div>`+
-   (x.outcome==='yes'?`<div class="note"><span>Przewidywanie się sprawdziło. To też cenna informacja. Zastanów się, czy było to tak złe, jak się wydawało, i jak sobie z tym poradziłeś/poradziłaś.</span></div>`:'')+
+  case 'res':return `<div class="recap"><span class="k">Plan</span><span>${h(x.plan)}</span><span class="k">Przewidywanie</span><span>${h(x.prediction)}</span>${x.criterion.trim()?`<span class="k">Poznam to po tym, że</span><span>${h(x.criterion)}</span>`:''}</div>`+
+   xta('result','Co się wydarzyło?','Kto co powiedział i zrobił…',5)+
+   (x.safety.trim()?`<div class="stack"><span class="f" style="font-weight:600;font-size:.92rem">Czy udało się zrezygnować z zabezpieczenia?</span><span class="score" style="margin:0">„${h(x.safety)}”</span><div class="seg" role="group" style="align-self:flex-start">${Object.entries(SAFE).map(([v,l])=>`<button class="${v==='yes'?'yes':v==='no'?'no':'mid'}" data-act="xsafe" data-v="${v}" aria-pressed="${x.safetyDone===v}">${l}</button>`).join('')}</div></div>`:'');
+  case 'concl':return `<div class="pairB"><b>B</b>${h(x.prediction)}</div>${x.altPred.trim()?`<div class="pairB g"><b>Alt.</b>${h(x.altPred)}</div>`:''}
+   <div class="stack"><div class="eyebrow">Które przewidywanie było bliżej prawdy?</div><div class="tcards">${CLOSER.filter(c=>c[0]!=='alt'||x.altText.trim()).map(c=>`<button class="tcard radio" data-act="xclose" data-v="${c[0]}" aria-pressed="${x.closer===c[0]}"><span>${c[1]}</span></button>`).join('')}</div></div>`+
+   (x.closer==='b'?`<div class="note"><span>Przewidywanie się sprawdziło. To też cenna informacja. Czy było to tak złe, jak się wydawało? Jak sobie z tym poradziłeś/poradziłaś?</span></div>`:'')+
    xta('learned','Czego się dowiadujesz?','Co to mówi o myśli B? Co było inaczej, niż się spodziewałeś/spodziewałaś?',3)+
-   `<div class="pairB"><b>B</b>${h(x.bText)}</div>`+xsl('belBAfter',`Na ile teraz w nią wierzysz? <small>przed: ${x.belB}%</small>`,x.belBAfter,0,100,'%');
+   `<div class="divider"></div>`+xsl('belBAfter',`Na ile teraz wierzysz w myśl B? <small>przed: ${x.belB}%</small>`,x.belBAfter,0,100,'%')+
+   (x.altText.trim()?xsl('belAltAfter',`Na ile teraz wierzysz w myśl alternatywną? <small>przed: ${x.belAlt}%</small>`,x.belAltAfter,0,100,'%','rg-goal'):'');
  }
 }
 function renderXWizard(){
  const steps=S.xmode==='plan'?XPLAN:XRES;const st=steps[S.xstep];const lastS=S.xstep===steps.length-1;
- const pct=Math.round((S.xstep+1)/steps.length*100);
- return `<div class="xwrap"><div class="xprog"><div class="mtop"><span><b>${S.xstep+1} / ${steps.length}</b> · ${S.xmode==='plan'?'Planowanie eksperymentu':'Wynik eksperymentu'}</span><button class="btn small ghost" data-act="xcancel">Anuluj</button></div><div class="pbar"><i style="width:${pct}%"></i></div></div>
- <section class="card side-exp"><div class="stephead"><div class="letter" aria-hidden="true">${S.xstep+1}</div><div class="eyebrow">${S.xmode==='plan'?'Eksperyment behawioralny':'Po eksperymencie'}</div><h2>${st.t}</h2></div>
+ const n=(S.xmode==='plan'?0:3)+S.xstep+1;const pct=Math.round(n/5*100);
+ return `<div class="xwrap"><div class="xprog"><div class="mtop"><span><b>${n} / 5</b> · ${st.r}</span><button class="btn small ghost" data-act="xcancel">Anuluj</button></div><div class="pbar"><i style="width:${pct}%"></i></div></div>
+ <section class="card side-exp"><div class="stephead"><div class="letter" aria-hidden="true">${n}</div><div class="eyebrow">${S.xmode==='plan'?'Planowanie eksperymentu':'Po eksperymencie'}</div><h2>${st.t}</h2></div>
  <p class="help">${st.h}</p><div class="fields">${xBody(st.k)}</div>
  <div class="stepnav">${S.xstep>0?'<button class="btn" data-act="xprev">← Wstecz</button>':''}${lastS?`<button class="btn primary" data-act="xsave">${S.xmode==='plan'?'Zaplanuj':'Zapisz wynik'}</button>`:'<button class="btn primary" data-act="xnext">Dalej →</button>'}</div><div style="height:16px"></div></section></div>`;
 }
-function gcalUrl(x){const d=(x.date||today()).replace(/-/g,'');const t=(x.time||'18:00').replace(':','');const [hh,mm]=(x.time||'18:00').split(':').map(Number);const end=String(Math.min(23,hh+(mm>=30?1:0))).padStart(2,'0')+String((mm+30)%60).padStart(2,'0');
- return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Eksperyment: '+x.plan.slice(0,80))+'&dates='+d+'T'+t+'00/'+d+'T'+end+'00&details='+encodeURIComponent('Myśl: '+x.bText+'\nPrzewidywanie: '+x.prediction+'\nPlan: '+x.plan)}
+/* planowanie całej drabinki */
+function renderLadderPlan(){
+ const L=S.ld;
+ return `<div class="xwrap"><div class="xprog"><div class="mtop"><span><b>Drabinka</b> · planowanie z góry</span><button class="btn small ghost" data-act="lcancel">Anuluj</button></div></div>
+ <section class="card side-exp"><div class="stephead"><div class="letter" aria-hidden="true">≡</div><div class="eyebrow">Drabinka przekonania</div><h2>Zaplanuj kroki od łatwego do trudnego</h2></div>
+ <p class="help">Wpisz kilka małych kroków, które pomogą sprawdzić tę myśl. Każdemu daj trudność. Szczegóły (przewidywanie, termin) uzupełnisz później, gdy będziesz gotów/gotowa na dany krok.</p>
+ <div class="fields"><label class="f">Myśl do sprawdzenia<textarea id="l-bText" data-lpath="bText" rows="2" placeholder="Np. Wszyscy zobaczą, że się nie nadaję.">${h(L.bText)}</textarea></label>${picker('ld',L.entryId,false)}
+ <div class="stack"><div class="eyebrow">Kroki</div>${L.steps.map((s,i)=>`<div class="lstep"><label class="dsel"><span class="sr">Trudność</span><select id="l-d-${i}" data-lstep="${i}" data-lk="d" aria-label="Trudność kroku ${i+1}">${Array.from({length:10},(_,k)=>`<option value="${k+1}"${s.d===k+1?' selected':''}>${k+1}</option>`).join('')}</select></label><textarea id="l-t-${i}" rows="2" data-lstep="${i}" data-lk="t" placeholder="${i===0?'Np. Zadaję pytanie koleżance po zajęciach.':'Kolejny, trochę trudniejszy krok…'}">${h(s.t)}</textarea><button class="xbtn" data-act="ldel" data-i="${i}" aria-label="Usuń krok">×</button></div>`).join('')}
+ <button class="btn small add" data-act="ladd">+ Dodaj krok</button><p class="score">Liczba po lewej to trudność od 1 do 10. Kolejność ułoży się sama.</p></div></div>
+ <div class="stepnav"><button class="btn primary" data-act="lsave">Zapisz drabinkę</button></div><div style="height:16px"></div></section></div>`;
+}
+/* psychoedukacja */
+const EDU_CAT=[
+ ['Jawne unikanie sytuacyjne','całkowite unikanie czynników wywołujących silne emocje',['nie idę na imprezę, na której będzie dużo obcych osób','nie otwieram maila od promotora','odwołuję prezentację','nie odbieram telefonu od osoby, z którą się pokłóciłem/pokłóciłam','omijam miejsce, z którym wiążą się trudne wspomnienia']],
+ ['Dyskretne unikanie behawioralne','zachowania, które zapobiegają pełnemu przeżywaniu emocji, gdy jawne unikanie nie wchodzi w grę',['idę na spotkanie, ale stoję z boku i prawie się nie odzywam','unikam kontaktu wzrokowego','podczas prezentacji mówię bardzo szybko, żeby jak najszybciej skończyć','nie piję kawy, żeby nie poczuć szybszego bicia serca','odkładam napisanie trudnej wiadomości „na później”']],
+ ['Unikanie poznawcze','strategie poznawcze stosowane w celu uniknięcia myślenia o niepokojącej rzeczy',['gdy pojawia się trudna myśl, od razu sięgam po telefon','mówię sobie „nie myśl o tym” i tłumię myśl','w trakcie rozmowy „odpływam” myślami','zamartwiam się i analizuję w kółko, zamiast poczuć emocję','powtarzam sobie „to nic takiego”, żeby nie poczuć smutku']],
+ ['Sygnały bezpieczeństwa','rzeczy wykorzystywane w celu poprawy samopoczucia lub zapobiegnięciu temu, by emocje osiągnęły przytłaczające nasilenie',['trzymam telefon w ręce','noszę przy sobie butelkę wody','mam w torebce leki „na wszelki wypadek”','wychodzę tylko z bezpieczną osobą','mam ze sobą kartkę z notatkami','mam słuchawki w uszach, nawet gdy nic nie słucham']]
+];
+const EDU_ALT=[['Nie idę na imprezę','Idę na 30 minut i rozmawiam z jedną nową osobą','Jawne unikanie'],['Nie otwieram maila od promotora','Otwieram go i czytam do końca','Jawne unikanie'],['Stoję z boku i milczę','Podchodzę do grupy i zadaję jedno pytanie','Dyskretne unikanie'],['Mówię szybko, żeby skończyć','Mówię wolniej i robię pauzy','Dyskretne unikanie'],['Od razu sięgam po telefon','Zostaję z myślą i nazywam emocję: „czuję lęk”','Unikanie poznawcze'],['Zamartwiam się w kółko','Robię RSA i Test Kamery','Unikanie poznawcze'],['Trzymam telefon w ręce','Chowam telefon do torby','Sygnał bezpieczeństwa'],['Wychodzę tylko z bezpieczną osobą','Idę sam/sama na krótko','Sygnał bezpieczeństwa']];
+function renderEdu(){
+ return `<div class="xwrap"><div class="toolbar"><button class="btn ghost" data-act="xeduclose">← Wróć</button></div>
+ <article class="card edu"><div class="eyebrow">Psychoedukacja</div><h2>Zabezpieczenia i zachowania alternatywne</h2>
+ <h3>Czym są zabezpieczenia?</h3><p>Zachowania, które na chwilę zmniejszają silne emocje albo pozwalają ich uniknąć. Dają ulgę (w języku RTZ to wzmocnienie negatywne), więc się utrwalają. Jednocześnie podtrzymują starą myśl, bo nie dają okazji sprawdzić, co stałoby się bez nich.</p>
+ <div class="cats">${EDU_CAT.map(([n,d,ex],i)=>`<section class="cat"><div class="cathead"><span class="catnum">${i+1}</span><div><b>${n}</b><span> – ${d}</span></div></div><ul>${ex.map(e=>`<li>${h(e)}</li>`).join('')}</ul></section>`).join('')}</div>
+ <h3>Jak odróżnić od zdrowego radzenia sobie</h3><p>Liczy się funkcja, a nie samo zachowanie. Kartka z notatkami może być zwykłą pomocą albo sygnałem bezpieczeństwa. Pytanie kontrolne: <i>„Czy robię to, żeby nie poczuć emocji albo nie dopuścić do tego, czego się boję?”</i></p>
+ <h3>Zachowania alternatywne</h3><ul class="plain"><li>Działania alternatywne to działania inne niż te, w które zwykle się angażujesz, gdy przeżywasz silne emocje i chcesz ich uniknąć.</li><li>Żeby je znaleźć, trzeba zacząć <b>robić</b> coś innego, a nie tylko przestać robić to, co dotąd. Bardzo trudno przejść od robienia czegoś do robienia niczego, zwłaszcza przy bardzo silnych emocjach.</li><li>Nowe sposoby reagowania na początku są trudniejsze, ale na dłuższą metę zmniejszają siłę emocji i dają poczucie dumy z tego, jak radzisz sobie z emocjami.</li></ul>
+ <div class="swaps">${EDU_ALT.map(([a,b,c])=>`<div class="swap"><span class="tagc">${c}</span><span class="was">${h(a)}</span><span class="now"><span aria-hidden="true">→</span> ${h(b)}</span></div>`).join('')}</div>
+ <h3>Jak pracować z tym w eksperymencie</h3><p>Nie trzeba rezygnować ze wszystkiego naraz. Można odpuszczać po jednym zabezpieczeniu na kolejnych szczeblach drabinki, za każdym razem wpisując, co zrobisz zamiast tego.</p>
+ <p class="score">Podział zachowań unikowych według Protokołu Ujednoliconego (Unified Protocol, Barlow i in.).</p></article></div>`;
+}
+function gcalUrl(x){const d=(x.date||today()).replace(/-/g,'');const [hh,mm]=(x.time||'18:00').split(':').map(Number);const t=String(hh).padStart(2,'0')+String(mm).padStart(2,'0');const endM=hh*60+mm+30;const te=String(Math.min(23,Math.floor(endM/60))).padStart(2,'0')+String(endM%60).padStart(2,'0');
+ return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Eksperyment: '+x.plan.slice(0,80))+'&dates='+d+'T'+t+'00/'+d+'T'+te+'00&details='+encodeURIComponent('Myśl: '+x.bText+'\nPrzewidywanie: '+x.prediction+'\nPlan: '+x.plan)}
 function icsDownload(x){
  const esc=s=>String(s||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
  const d=(x.date||today()).replace(/-/g,'');const [hh,mm]=(x.time||'18:00').split(':').map(Number);const t=String(hh).padStart(2,'0')+String(mm).padStart(2,'0');
@@ -667,24 +761,38 @@ function icsDownload(x){
  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Dziennik RSA//PL','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT','UID:'+x.id+'@dziennik-rsa','DTSTAMP:'+stamp,'DTSTART:'+d+'T'+t+'00','DTEND:'+d+'T'+te+'00','SUMMARY:'+esc('Eksperyment: '+x.plan.slice(0,80)),'DESCRIPTION:'+esc('Myśl: '+x.bText+'\nPrzewidywanie: '+x.prediction+'\nPlan: '+x.plan),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+esc('Eksperyment z Dziennika RSA'),'TRIGGER:-PT30M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
  try{const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='eksperyment-rsa.ics';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('Otwieram plik kalendarza')}catch(err){toast('Nie udało się utworzyć pliku. Użyj Kalendarza Google.')}
 }
+const gkey=t=>t.trim().toLowerCase();
+const closerOf=x=>x.closer||({yes:'b',partly:'mid',no:'none'})[x.outcome]||null;
+function rungHtml(x){
+ const st=x.status;
+ if(st==='todo')return `<div class="rung todo"><span class="deg">${x.diff}</span><div class="rb"><span>${h(x.plan)}</span><div class="tools"><button class="btn small" data-act="xtodo" data-id="${x.id}">Zaplanuj ten krok</button><button class="linkbtn" data-act="xdel" data-id="${x.id}">Usuń</button></div></div></div>`;
+ if(st==='planned')return `<div class="rung plan"><span class="deg">${x.diff}</span><div class="rb"><span>${h(x.plan)}</span><span class="meta"><span class="pill ex">zaplanowany ${fmtS(x.date)}</span></span><div class="tools"><button class="btn small primary" data-act="xres" data-id="${x.id}">Zapisz wynik</button></div></div></div>`;
+ const c=closerOf(x);
+ return `<div class="rung done"><span class="deg">${x.diff}</span><details class="rb"><summary><span>${h(x.plan)}</span><span class="meta"><span>${fmtS(x.doneDate||x.date)}</span>${c?`<span class="${CMAP[c][2]}">${CSHORT[c]}</span>`:''}${x.example?'<span class="pill ex">przykład</span>':''}</span></summary>
+ <div class="body"><p><span class="k">Przewidywanie</span><br>${h(x.prediction)}</p>${x.criterion&&x.criterion.trim()?`<p><span class="k">Poznam to po tym, że</span><br>${h(x.criterion)}</p>`:''}${x.altPred&&x.altPred.trim()?`<p><span class="k">Przewidywanie alternatywne</span><br>${h(x.altPred)}</p>`:''}${x.safety&&x.safety.trim()?`<p><span class="k">Bez zabezpieczenia</span><br>${h(x.safety)}${x.instead&&x.instead.trim()?` → ${h(x.instead)}`:''}${x.safetyDone?` <span class="pill mute">${SAFE[x.safetyDone]}</span>`:''}</p>`:''}<p><span class="k">Co się wydarzyło</span><br>${h(x.result)||'—'}</p><p><span class="k">Wniosek</span><br>${h(x.learned)||'—'}</p>
+ <p class="change">B: <b>${x.belB}% → ${x.belBAfter??'—'}%</b>${x.altText&&x.altText.trim()?` · alternatywna: <b>${x.belAlt}% → ${x.belAltAfter??'—'}%</b>`:''}</p><div class="tools"><button class="linkbtn" data-act="xdel" data-id="${x.id}">Usuń</button></div></div></details></div>`;
+}
 function renderExp(){
+ if(ui.sub==='edu')return renderEdu();
+ if(S.ld)return renderLadderPlan();
  if(S.xd)return renderXWizard();
  const planned=S.exps.filter(x=>x.status==='planned').sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
- const done=S.exps.filter(x=>x.status==='done');
- const groups={};done.forEach(x=>{const k=x.bText.trim().toLowerCase();(groups[k]=groups[k]||[]).push(x)});
- const garr=Object.values(groups).map(g=>g.sort((a,b)=>(a.doneDate||a.date).localeCompare(b.doneDate||b.date))).sort((a,b)=>(b[b.length-1].doneDate||'').localeCompare(a[a.length-1].doneDate||''));
- const intro=`<div class="card" style="padding-bottom:22px"><h3>Sprawdzaj myśli w praktyce</h3><p class="help" style="margin:8px 0 14px">Eksperyment to mały krok w prawdziwym życiu. Zapisujesz, czego się spodziewasz, robisz coś inaczej i patrzysz, co faktycznie się dzieje. Tak nowe przekonania przestają być tylko „na papierze”.</p><button class="btn primary" data-act="xnew">Zaplanuj pierwszy eksperyment</button></div>`;
- return `<div class="xwrap"><div class="toolbar"><h2>Eksperymenty</h2><button class="btn primary" data-act="xnew">+ Nowy eksperyment</button></div>
- ${!S.exps.length?intro:''}
- ${planned.length?`<div class="sect">Zaplanowane</div><div class="stack">${planned.map(x=>`<div class="xcard" id="xc-${x.id}"><div class="meta"><span>${fmt(x.date)}, ${h(x.time||'')}</span><span class="pill ex">trudność ${x.diff}/10</span>${x.example?'<span class="pill ex">przykład</span>':''}</div>
+ const groups={};S.exps.forEach(x=>{const k=gkey(x.bText);(groups[k]=groups[k]||[]).push(x)});
+ const last=g=>g.reduce((m,x)=>{const d=x.doneDate||x.date||'';return d>m?d:m},'');
+ const garr=Object.values(groups).sort((a,b)=>last(b).localeCompare(last(a)));
+ const startBtns=`<div class="twobtn"><button class="btn primary" data-act="xnew">+ Eksperyment</button><button class="btn" data-act="lnew">+ Drabinka</button></div>`;
+ const eduLink=`<button class="tcard edulink" data-act="xedu"><b>Czym są zabezpieczenia i zachowania alternatywne?</b><small>Krótka psychoedukacja: rodzaje unikania i jak je zastępować.</small></button>`;
+ if(!S.exps.length)return `<div class="xwrap"><div class="toolbar"><h2>Eksperymenty</h2></div><div class="card" style="padding-bottom:22px"><h3>Sprawdzaj myśli w praktyce</h3><p class="help" style="margin:8px 0 14px">Eksperyment to mały krok w prawdziwym życiu. Zapisujesz, czego się spodziewasz, robisz coś inaczej i patrzysz, co faktycznie się dzieje. Możesz zaplanować jeden eksperyment albo od razu całą drabinkę kroków od łatwego do trudnego.</p>${startBtns}</div><div class="sect">Wiedza</div>${eduLink}</div>`;
+ return `<div class="xwrap"><div class="toolbar"><h2>Eksperymenty</h2>${startBtns}</div>
+ ${planned.length?`<div class="sect">Najbliższe</div><div class="stack">${planned.map(x=>`<div class="xcard"><div class="meta"><span>${fmt(x.date)}, ${h(x.time||'')}</span><span class="pill ex">trudność ${x.diff}/10</span>${x.example?'<span class="pill ex">przykład</span>':''}</div>
  <div class="quote">„${h(x.bText)}”</div><p><span class="k">Plan</span><br>${h(x.plan)}</p><p><span class="k">Przewidywanie</span><br>${h(x.prediction)}</p>
- <div class="tools"><button class="btn small primary" data-act="xres" data-id="${x.id}">Zapisz wynik</button><button class="btn small" data-act="xics" data-id="${x.id}">Do kalendarza</button><a class="btn small" href="${h(gcalUrl(x))}" target="_blank" rel="noopener">Kalendarz Google</a><button class="linkbtn" data-act="xdel" data-id="${x.id}">Usuń</button></div></div>`).join('')}</div>`:''}
- ${garr.length?`<div class="sect">Drabinki przekonań</div><div class="stack">${garr.map(g=>{const f=g[0],l=g[g.length-1];return `<div class="xcard"><div class="quote">„${h(f.bText)}”</div>
- <div class="change">Wiara w myśl: <b>${f.belB}% → ${l.belBAfter??l.belB}%</b></div>
- <div class="ladder">${[...g].sort((a,b)=>a.diff-b.diff||(a.date).localeCompare(b.date)).map(x=>`<div class="rung"><span class="deg" title="trudność">${x.diff}</span><details><summary><span>${h(x.plan)}</span><span class="meta" style="display:flex;gap:6px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)"><span>${fmtS(x.doneDate||x.date)}</span>${x.outcome?`<span class="${OUT[x.outcome][1]}">${OUT[x.outcome][0]}</span>`:''}${x.example?'<span class="pill ex">przykład</span>':''}</span></summary>
- <div class="body"><p><span class="k">Przewidywanie</span><br>${h(x.prediction)}</p><p><span class="k">Co się wydarzyło</span><br>${h(x.result)||'—'}</p><p><span class="k">Wniosek</span><br>${h(x.learned)||'—'}</p><p class="change">Wiara w myśl: <b>${x.belB}% → ${x.belBAfter??'—'}%</b></p><div class="tools"><button class="linkbtn" data-act="xdel" data-id="${x.id}">Usuń</button></div></div></details></div>`).join('')}</div>
- <div class="tools"><button class="btn small" data-act="xrung" data-id="${l.id}">+ Kolejny szczebel</button></div></div>`}).join('')}</div>`:''}
- </div>`;
+ <div class="tools"><button class="btn small primary" data-act="xres" data-id="${x.id}">Zapisz wynik</button><button class="btn small" data-act="xics" data-id="${x.id}">Do kalendarza</button><a class="btn small" href="${h(gcalUrl(x))}" target="_blank" rel="noopener">Kalendarz Google</a></div></div>`).join('')}</div>`:''}
+ ${garr.length?`<div class="sect">Drabinki przekonań</div><div class="stack">${garr.map(g=>{const done=g.filter(x=>x.status==='done').sort((a,b)=>(a.doneDate||a.date).localeCompare(b.doneDate||b.date));const f=done[0],l=done[done.length-1];const hasAlt=done.some(x=>x.altText&&x.altText.trim());
+  return `<div class="xcard"><div class="quote">„${h(g[0].bText)}”</div>
+ <div class="meta"><span class="pill mute">${done.length} z ${g.length} zrobione</span>${f?`<span class="change">Wiara w B: <b>${f.belB}% → ${l.belBAfter??l.belB}%</b></span>`:''}${f&&hasAlt?`<span class="change">alternatywna: <b>${(done.find(x=>x.altText&&x.altText.trim())||f).belAlt}% → ${l.belAltAfter??l.belAlt}%</b></span>`:''}</div>
+ <div class="ladder">${[...g].sort((a,b)=>a.diff-b.diff||(a.date||'').localeCompare(b.date||'')).map(rungHtml).join('')}</div>
+ <div class="tools"><button class="btn small" data-act="xrung" data-id="${g[0].id}">+ Dodaj szczebel</button></div></div>`}).join('')}</div>`:''}
+ <div class="sect">Wiedza</div>${eduLink}</div>`;
 }
 
 /* ---------- widok: wzorce ---------- */
@@ -704,7 +812,7 @@ function renderPat(){
  const emos={},qn=[0,0,0,0,0],qa=[0,0,0,0,0];
  E.forEach(e=>{e.B.forEach(b=>{if(!b.text.trim())return;b.q.forEach((v,i)=>{if(v!==null){qa[i]++;if(v===false)qn[i]++}})});e.C.em.forEach(m=>{const n=m.name.trim().toLowerCase();if(n)emos[n]=(emos[n]||0)+1})});
  const emoArr=Object.entries(emos).sort((a,b)=>b[1]-a[1]).slice(0,6);
- const done=S.exps.filter(x=>x.status==='done');const checked=done.filter(x=>x.outcome);const came=checked.filter(x=>x.outcome==='yes').length;
+ const done=S.exps.filter(x=>x.status==='done');const checked=done.filter(x=>closerOf(x));const came=checked.filter(x=>closerOf(x)==='b').length;
  const emax=emoArr[0]?emoArr[0][1]:1;
  const full=E.filter(e=>e.status!=='left');
  const ex=E.some(e=>e.example)||S.exps.some(x=>x.example);
@@ -712,9 +820,9 @@ function renderPat(){
  const bgs=Object.values(bg).map(g=>g.sort((a,b)=>(a.doneDate||a.date).localeCompare(b.doneDate||b.date)));
  return `<div class="toolbar"><h2>Wzorce w czasie</h2></div>
  ${ex?`<div class="banner"><span>Statystyki obejmują przykładowe dane.</span><button class="btn small" data-act="clearEx">Usuń przykłady</button></div>`:''}
- <div class="stats"><div class="stat"><div class="v">${E.length}</div><div class="l">zapisanych analiz</div></div><div class="stat"><div class="v">${done.length}</div><div class="l">zrobionych eksperymentów</div></div><div class="stat"><div class="v">${checked.length?came+' z '+checked.length:'—'}</div><div class="l">przewidywań się sprawdziło</div></div></div>
+ <div class="stats"><div class="stat"><div class="v">${E.length}</div><div class="l">zapisanych analiz</div></div><div class="stat"><div class="v">${done.length}</div><div class="l">zrobionych eksperymentów</div></div><div class="stat"><div class="v">${checked.length?came+' z '+checked.length:'—'}</div><div class="l">przewidywań myśli B się sprawdziło</div></div></div>
  <div class="pgrid">
- <div class="panel wide"><h3>Wiara w myśli po eksperymentach</h3><p class="sub">Dla każdej sprawdzanej myśli: od pierwszego eksperymentu do ostatniego. Pełna kropka to stan teraz.</p>${bgs.length?bgs.map(g=>{const f=g[0],l=g[g.length-1];return `<div class="belgrp"><span class="quote">„${h(f.bText)}” <span class="pill mute">${g.length} ${g.length===1?'eksperyment':g.length<5?'eksperymenty':'eksperymentów'}</span></span>${dumb('b','B',f.belB,l.belBAfter??f.belB)}</div>`}).join(''):'<p class="empty">Pojawi się po pierwszym zakończonym eksperymencie.</p>'}</div>
+ <div class="panel wide"><h3>Wiara w myśli po eksperymentach</h3><p class="sub">Dla każdej sprawdzanej myśli: od pierwszego eksperymentu do ostatniego. Pełna kropka to stan teraz.</p>${bgs.length?bgs.map(g=>{const f=g[0],l=g[g.length-1];return `<div class="belgrp"><span class="quote">„${h(f.bText)}” <span class="pill mute">${g.length} ${g.length===1?'eksperyment':g.length<5?'eksperymenty':'eksperymentów'}</span></span>${dumb('b','B',f.belB,l.belBAfter??f.belB)}${(()=>{const a=g.find(x=>x.altText&&x.altText.trim()&&x.belAltAfter!=null);return a?dumb('z','Alt.',a.belAlt,l.belAltAfter??a.belAlt):''})()}</div>`}).join(''):'<p class="empty">Pojawi się po pierwszym zakończonym eksperymencie.</p>'}</div>
  <div class="panel wide"><h3>Natężenie emocji: jak jest i jak chcę</h3><p class="sub">Najwyższe natężenie w każdej pełnej analizie. Gdy linie się zbliżają, różnica między reakcją a celem maleje.</p><div class="chartbox">${full.length>=2?lineChart(full.map(e=>fmtS(e.date)),[{vals:full.map(e=>e.ZC.em.some(m=>m.name.trim())?maxN(e.ZC.em):null),c:'var(--goal)'},{vals:full.map(e=>maxN(e.C.em)),c:'var(--now)'}],10,[0,2,4,6,8,10],'Natężenie emocji w kolejnych analizach'):'<p class="empty">Wykres pojawi się po co najmniej dwóch pełnych analizach.</p>'}</div><div class="legend"><span><i style="background:var(--now)"></i>C · jak jest</span><span><i style="background:var(--goal)"></i>ZC · jak chcę</span></div></div>
  <div class="panel"><h3>Najczęstsze emocje</h3><p class="sub">Ile razy emocja pojawiła się w kroku C.</p>${emoArr.map(([t,n])=>`<div class="hbar"><span class="t">${h(t)}</span><span class="b"><i style="width:${n/emax*100}%"></i></span><span class="n">${n}</span></div>`).join('')||'<p class="empty">—</p>'}</div>
  <div class="panel"><h3>Gdzie myśli najczęściej nie przechodzą testu</h3><p class="sub">Odsetek odpowiedzi „nie” w Pięciu Pytaniach dla myśli B.</p>${QSHORT.map((q,i)=>{const p=qa[i]?Math.round(qn[i]/qa[i]*100):0;return `<div class="hbar"><span class="t">${i+1}. ${q}</span><span class="b"><i class="bal" style="width:${p}%"></i></span><span class="n">${qa[i]?p+'%':'—'}</span></div>`}).join('')}</div>
@@ -730,15 +838,16 @@ function render(){
  app.innerHTML=ui.view==='new'?renderNew():ui.view==='log'?renderLog():ui.view==='exp'?renderExp():renderPat();
  if(ui.focus){const el=document.getElementById(ui.focus);ui.focus=null;if(el){try{el.focus({preventScroll:true})}catch(e){el.focus()}el.scrollIntoView({block:'center',behavior:'smooth'})}}
 }
-function go(v){ui.view=v;ui.railOpen=false;render();window.scrollTo({top:0})}
+function go(v){ui.view=v;ui.railOpen=false;ui.sub=null;render();window.scrollTo({top:0})}
 function defFor(p){return /em$/.test(p)?{name:'',n:5}:''}
 const top0=()=>window.scrollTo({top:0});
 
 document.querySelector('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.view)});
 app.addEventListener('input',e=>{
  const el=e.target;
- if(el.dataset.xpath&&S.xd){let v=el.value;if(el.type==='range'){v=+v;const o=el.parentNode.querySelector('output');if(o)o.textContent=v+(el.dataset.suf||'')}S.xd[el.dataset.xpath]=v;save();
-  return}
+ if(el.dataset.xpath&&S.xd){let v=el.value;if(el.type==='range'){v=+v;const o=el.parentNode.querySelector('output');if(o)o.textContent=v+(el.dataset.suf||'')}const was=String(S.xd[el.dataset.xpath]||'').trim()==='';S.xd[el.dataset.xpath]=v;save();
+  if(el.dataset.xpath==='altText'&&was!==(v.trim()==='')){render();const t=document.getElementById('x-altText');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length)}}return}
+ if(S.ld&&(el.dataset.lpath||el.dataset.lstep)){if(el.dataset.lpath)S.ld[el.dataset.lpath]=el.value;else{const st=S.ld.steps[+el.dataset.lstep];st[el.dataset.lk]=el.dataset.lk==='d'?+el.value:el.value}save();return}
  const p=el.dataset.path;if(!p||!S.draft)return;let v=el.value;if(el.type==='range'){v=+v;const o=el.parentNode.querySelector('output');if(o)o.textContent=v}setP(S.draft,p,v);save();updateHints();
 });
 app.addEventListener('click',e=>{
@@ -778,19 +887,29 @@ app.addEventListener('click',e=>{
    ents.forEach(x=>{if(x&&x.id&&Array.isArray(x.B)){migrate(x);const k=S.entries.findIndex(y=>y.id===x.id);if(k>=0)S.entries[k]=x;else S.entries.push(x);n++}});
    xs.forEach(x=>{if(x&&x.id){const k=S.exps.findIndex(y=>y.id===x.id);if(k>=0)S.exps[k]=x;else S.exps.push(x);n++}});toast('Wczytano elementów: '+n)}catch(err){toast('Nie udało się wczytać. Sprawdź, czy wklejono cały tekst kopii.');return}break}
   /* eksperymenty */
-  case 'xnew':S.xd=blankExp();S.xmode='plan';S.xstep=0;ui.view='exp';top0();break;
-  case 'xfromEntry':S.xd=blankExp({entryId:b.dataset.id});S.xmode='plan';S.xstep=0;ui.view='exp';top0();break;
-  case 'xfree':S.xd.free=true;break;
-  case 'xrung':{const base=S.exps.find(x=>x.id===b.dataset.id);S.xd=blankExp({entryId:base.entryId,bId:base.bId,bText:base.bText,belB:base.belBAfter??base.belB,diff:Math.min(10,base.diff+1)});S.xmode='plan';S.xstep=0;top0();break}
-  case 'xpick':{const [en,bb]=findB(b.dataset.e,b.dataset.b);if(!bb)return;S.xd.entryId=en.id;S.xd.bId=bb.id;S.xd.bText=bb.text;break}
-  case 'xout':S.xd.outcome=S.xd.outcome===b.dataset.v?null:b.dataset.v;break;
-  case 'xnext':{const k=(S.xmode==='plan'?XPLAN:XRES)[S.xstep].k;if(k==='thought'&&!S.xd.bText.trim()){toast('Wybierz albo wpisz myśl');return}if(k==='pred'&&!S.xd.prediction.trim()){toast('Zapisz, co by się stało');return}S.xstep++;top0();break}
+  case 'xnew':ui.sub=null;S.ld=null;S.xd=blankExp();S.xmode='plan';S.xstep=0;ui.view='exp';top0();break;
+  case 'xfromEntry':ui.sub=null;S.ld=null;S.xd=blankExp({entryId:b.dataset.id});S.xmode='plan';S.xstep=0;ui.view='exp';top0();break;
+  case 'xpick':{const [en,bb]=findB(b.dataset.e,b.dataset.b);if(!bb)return;const txt=b.dataset.k==='ZB'?bb.zb.text:bb.text;const t=b.dataset.t;
+   if(t==='ld'){S.ld.bText=txt;S.ld.entryId=en.id}else{S.xd[t]=txt;if(t==='bText'){S.xd.entryId=en.id;S.xd.bId=bb.id}}toast('Dodano myśl');break}
+  case 'xnext':{const k=(S.xmode==='plan'?XPLAN:XRES)[S.xstep].k;if(k==='thought'&&!S.xd.bText.trim()){toast('Wpisz myśl do sprawdzenia');return}if(k==='pred'&&!S.xd.prediction.trim()){toast('Zapisz, co by się stało');return}if(k==='res'&&!S.xd.result.trim()){toast('Opisz, co się wydarzyło');return}S.xstep++;top0();break}
   case 'xprev':S.xstep=Math.max(0,S.xstep-1);top0();break;
   case 'xcancel':if(b.dataset.sure){S.xd=null;S.xstep=0}else{b.dataset.sure='1';b.textContent='Na pewno?';b.classList.add('danger');return}break;
-  case 'xsave':{const x=clone(S.xd);delete x.free;if(S.xmode==='plan'){if(!x.plan.trim()){toast('Wpisz, co dokładnie zrobisz');return}x.status='planned'}else{x.status='done';x.doneDate=today()}x.example=false;const k=S.exps.findIndex(y=>y.id===x.id);if(k>=0)S.exps[k]=x;else S.exps.push(x);toast(S.xmode==='plan'?'Eksperyment zaplanowany':'Zapisano wynik');S.xd=null;S.xstep=0;top0();break}
-  case 'xres':{const x=clone(S.exps.find(y=>y.id===b.dataset.id));if(x.belBAfter==null)x.belBAfter=x.belB;S.xd=x;S.xmode='result';S.xstep=0;top0();break}
+  case 'xsafe':S.xd.safetyDone=S.xd.safetyDone===b.dataset.v?null:b.dataset.v;break;
+  case 'xclose':S.xd.closer=S.xd.closer===b.dataset.v?null:b.dataset.v;break;
+  case 'xsave':{const x=clone(S.xd);if(S.xmode==='plan'){if(!x.plan.trim()){toast('Wpisz, co dokładnie zrobisz');return}x.status='planned'}else{x.status='done';x.doneDate=today()}x.example=false;const k=S.exps.findIndex(y=>y.id===x.id);if(k>=0)S.exps[k]=x;else S.exps.push(x);toast(S.xmode==='plan'?'Eksperyment zaplanowany':'Zapisano wynik');S.xd=null;S.xstep=0;top0();break}
+  case 'xres':{const x=migrateExp(clone(S.exps.find(y=>y.id===b.dataset.id)));if(x.belBAfter==null)x.belBAfter=x.belB;if(x.belAltAfter==null)x.belAltAfter=x.belAlt;S.xd=x;S.xmode='result';S.xstep=0;ui.sub=null;top0();break}
+  case 'xtodo':{const x=migrateExp(clone(S.exps.find(y=>y.id===b.dataset.id)));const prev=S.exps.filter(y=>gkey(y.bText)===gkey(x.bText)&&y.status==='done').sort((a,c)=>(a.doneDate||'').localeCompare(c.doneDate||'')).pop();if(prev){x.belB=prev.belBAfter??prev.belB;if(!x.altText&&prev.altText){x.altText=prev.altText}x.belAlt=prev.belAltAfter??prev.belAlt}if(!x.date)x.date=inDays(1);S.xd=x;S.xmode='plan';S.xstep=0;top0();break}
   case 'xics':icsDownload(S.exps.find(y=>y.id===b.dataset.id));return;
-  case 'xdel':if(b.dataset.sure){S.exps=S.exps.filter(x=>x.id!==b.dataset.id);toast('Eksperyment usunięty')}else{b.dataset.sure='1';b.textContent='Na pewno usunąć?';b.style.color='var(--danger)';return}break;
+  case 'xdel':if(b.dataset.sure){S.exps=S.exps.filter(x=>x.id!==b.dataset.id);toast('Usunięto')}else{b.dataset.sure='1';b.textContent='Na pewno usunąć?';b.style.color='var(--danger)';return}break;
+  case 'xedu':ui.sub='edu';top0();break;
+  case 'xeduclose':ui.sub=null;top0();break;
+  case 'xrung':{const base=S.exps.find(x=>x.id===b.dataset.id);const mx=Math.max(...S.exps.filter(y=>gkey(y.bText)===gkey(base.bText)).map(y=>y.diff));S.ld={bText:base.bText,entryId:base.entryId,steps:[{t:'',d:Math.min(10,mx+1)}],grp:true};ui.focus='l-t-0';top0();break}
+  case 'lnew':ui.sub=null;S.xd=null;S.ld={bText:'',entryId:null,steps:[{t:'',d:2},{t:'',d:5},{t:'',d:8}]};top0();break;
+  case 'ladd':{const lst=S.ld.steps;lst.push({t:'',d:Math.min(10,(lst.length?lst[lst.length-1].d:1)+2)});ui.focus='l-t-'+(lst.length-1);break}
+  case 'ldel':S.ld.steps.splice(i,1);if(!S.ld.steps.length)S.ld.steps.push({t:'',d:3});break;
+  case 'lcancel':if(b.dataset.sure){S.ld=null}else{b.dataset.sure='1';b.textContent='Na pewno?';b.classList.add('danger');return}break;
+  case 'lsave':{const L=S.ld;if(!L.bText.trim()){toast('Wpisz myśl do sprawdzenia');return}const st=L.steps.filter(s=>s.t.trim());if(!st.length){toast('Dodaj co najmniej jeden krok');return}
+   st.forEach(s=>S.exps.push(blankExp({bText:L.bText.trim(),entryId:L.entryId,plan:s.t.trim(),diff:+s.d,status:'todo',date:''})));S.ld=null;toast(st.length===1?'Dodano krok do drabinki':'Zapisano drabinkę');top0();break}
  }
  save();render();
 });
@@ -802,7 +921,7 @@ document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.active
 let rz;window.addEventListener('resize',()=>{if(ui.view!=='pat')return;clearTimeout(rz);rz=setTimeout(render,200)});
 
 load();
-if(S.xd)ui.view='exp';
+if(S.xd||S.ld)ui.view='exp';
 render();
 })();
 </script>
